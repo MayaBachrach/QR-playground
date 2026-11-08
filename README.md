@@ -19,6 +19,8 @@ The QR engine is bundled locally; no CDN or network request is needed to generat
 To rebuild: `npm ci && npm run build`. To verify rendered QR decoding: `npm test`.
 
 ## Scanning limits
+The large-area search checks erasing whole rectangles, preserves protected modules, and expands successful candidates. It highlights up to three alternatives sorted by area. This bounded search does not guarantee the mathematical global maximum. Choose an alternative, then use the erase button; erasure is checked again. Any edit invalidates the results. Run `node test-regions.cjs` for search invariants.
+
 Error correction works on codewords, not a fixed percentage of editable squares. A successful local decode does not guarantee reliable phone scanning or print performance. Test the finished design on several devices at its intended size. Styling can reduce the available correction margin. Changing the input, correction level, or mask resets the drawing.
 
 ## Dependencies
