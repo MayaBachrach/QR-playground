@@ -1,0 +1,22 @@
+{
+  "name": "qr-playground",
+  "version": "1.0.0",
+  "description": "Interactive QR module drawing with verified error correction",
+  "scripts": {
+    "build": "esbuild engine.js --bundle --minify --outfile=qr-engine.js",
+    "test": "node test.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "jsqr": "^1.4.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "pngjs": "^7.0.0"
+  },
+  "private": true
+}
