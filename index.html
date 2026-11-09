@@ -1,245 +1,195 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#06120a">
-<meta name="description" content="qArt — Experimental matrix encoder, 1955.">
-<title>qArt | COMPUTING LABORATORY, 1955</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="qArt — a simple two-color matrix editor.">
+<title>qArt — MATRIX EDITOR</title>
 <style>
-:root{
- color-scheme:dark;
- --black:#06120a;--shadow:#0d2111;--olive:#2a4327;--mid:#416a3b;
- --phosphor:#83e892;--ivory:#e5f3cd;--amber:#d3b568;
- font-family:'Courier New',Courier,monospace;color:var(--phosphor);
-}
+:root{--black:#000000;--green:#39ff14;color-scheme:dark;
+  font-family:"Courier New",Courier,monospace;color:var(--green);background:var(--black)}
 *{box-sizing:border-box}
-html,body{height:100%;width:100%;margin:0;overflow:hidden}
-body{background:var(--black);font-family:'Courier New',Courier,monospace}
-button,input,select{font:inherit}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--black)}
+button,input,select{font:inherit;border-radius:0}
 button{cursor:pointer}
-button:disabled,input:disabled,select:disabled{opacity:.55;cursor:wait}
-button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{outline:3px dashed var(--amber);outline-offset:2px}
-.terminal{
- height:100dvh;width:100%;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr) auto;
- gap:9px;padding:clamp(9px,1.2vw,19px);
- background-color:var(--black);
- background-image:linear-gradient(90deg,#102718 1px,transparent 1px),linear-gradient(#102718 1px,transparent 1px);
- background-size:16px 16px;
-}
-.topbar{
- display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr);
- gap:14px;align-items:center;min-height:70px;padding:8px 16px;
- border:3px double var(--mid);background:var(--shadow);
-}
-.hud-brand{display:flex;align-items:center;gap:15px;direction:ltr;min-width:0}
-.hud-brand h1{margin:0;color:var(--ivory);font-size:clamp(34px,3.4vw,60px);font-weight:bold;line-height:1;letter-spacing:-4px}
-.hud-brand h1 em{font-style:normal;color:var(--phosphor)}
-.hud-brand .sub{color:var(--amber);font-size:11px;font-weight:bold;line-height:1.3;letter-spacing:1px}
-.top-center{text-align:center;color:var(--ivory);font-size:11px;line-height:1.7;font-weight:bold;letter-spacing:1px}
-.top-center small{display:block;color:var(--phosphor);font-size:11px}
-.hud-right{display:flex;align-items:center;justify-content:flex-end;gap:12px;direction:ltr;font-size:11px;white-space:nowrap;color:var(--amber);font-weight:bold}
-.hud-dots{display:flex;gap:6px}.hud-dots b{display:block;width:12px;height:12px;background:var(--phosphor);border:2px solid var(--olive)}
-.hud-dots b:nth-child(2){background:var(--amber)}.hud-dots b:nth-child(3){background:var(--ivory)}
-.display{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,350px);gap:9px}
-.game-screen,.control-panel,.export-panel{
- min-height:0;min-width:0;border:2px solid var(--mid);background:var(--shadow);position:relative;
-}
-.game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:7px;padding:11px}
-.section-head{min-height:26px;display:flex;align-items:center;justify-content:space-between;gap:8px;
- padding:2px 0 6px;border-bottom:2px solid var(--mid);direction:ltr;
- font-size:12px;line-height:1.2;letter-spacing:.7px;font-weight:bold;color:var(--ivory)}
-.section-head .state{color:var(--amber)}
-.playfield{
- position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;
- border:2px solid var(--olive);background:var(--black);
- background-image:linear-gradient(90deg,#102718 1px,transparent 1px),linear-gradient(#102718 1px,transparent 1px);
- background-size:12px 12px;
-}
-.playfield:before,.playfield:after{content:'';position:absolute;z-index:2;width:18px;height:18px;border:3px solid var(--amber);pointer-events:none}
-.playfield:before{top:8px;right:8px;border-left:0;border-bottom:0}
-.playfield:after{bottom:8px;left:8px;border-right:0;border-top:0}
-.qr-rack{
- flex:none;height:min(100%,calc(100vw - 470px));max-height:calc(100% - 18px);max-width:calc(100% - 22px);
- aspect-ratio:1;background:#e5f3cd;border:5px solid var(--mid);padding:8px;outline:2px solid var(--black);
-}
-#qr{display:grid;place-items:center;height:100%;width:100%;touch-action:manipulation}
-#qr svg,#qr canvas{display:block;height:100%;width:100%;max-width:100%;max-height:100%}
+button:disabled,input:disabled,select:disabled{opacity:.65;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{
+  outline:3px solid var(--green);outline-offset:3px}
+.terminal{width:100%;height:100dvh;padding:clamp(10px,1.25vw,20px);display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;gap:12px;overflow:hidden;background:var(--black)}
+.topbar{min-height:70px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;border:3px solid var(--green);padding:8px 18px}
+.brand{display:flex;gap:20px;align-items:center;min-width:0}
+.brand h1{font-size:clamp(36px,4vw,64px);line-height:1;margin:0;letter-spacing:-4px;font-weight:900}
+.brand .label{font-size:17px;line-height:1.3;font-weight:900}
+.hud{font-size:17px;font-weight:900;white-space:nowrap}
+.display{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,370px);gap:12px}
+.game-screen,.control-panel{min-width:0;min-height:0;border:3px solid var(--green);background:var(--black)}
+.game-screen{padding:13px;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:11px}
+.section-head{font-size:19px;line-height:1.1;font-weight:900;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:3px solid var(--green)}
+.section-head .right{font-size:15px;white-space:nowrap}
+.playfield{display:flex;align-items:center;justify-content:center;min-height:0;min-width:0;
+  border:3px solid var(--green);overflow:hidden}
+.qr-rack{width:min(calc(100% - 24px),calc(100dvh - 260px),620px);aspect-ratio:1;
+  flex:none;padding:8px;border:4px solid var(--green);background:var(--green)}
+#qr{width:100%;height:100%;display:grid;place-items:center;touch-action:manipulation}
+#qr svg,#qr canvas{height:100%;width:100%;max-width:100%;max-height:100%;display:block;
+  image-rendering:pixelated;shape-rendering:crispEdges}
 #qr [data-cell]{cursor:crosshair}
-#qr [data-cell]:focus{outline:none;stroke:#e6007e;stroke-width:.15}
-.stage-tip{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--phosphor);
- font-size:11px;font-weight:bold;direction:ltr;min-height:16px}
-.stage-tip span:last-child{color:var(--amber)}
-.tools-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.pixel-button,.region-results button{
- min-height:46px;padding:7px 6px;background:var(--olive);color:var(--ivory);
- border:2px solid var(--mid);border-radius:0;box-shadow:none;white-space:normal;
- font-family:inherit;font-size:12px;font-weight:bold;line-height:1.3;
-}
-.pixel-button.primary{background:var(--ivory);color:var(--black)}
-.pixel-button.green{background:var(--phosphor);color:var(--black)}
-.pixel-button:hover:not(:disabled),.region-results button:hover:not(:disabled){background:var(--amber);color:var(--black)}
-.pixel-button:active:not(:disabled){transform:translate(1px,1px)}
-.region-results{display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-height:79px;overflow:hidden;min-height:0}
+#qr [data-cell]:focus{outline:none;stroke:var(--black);stroke-width:.1}
+.tools-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+button{border:3px solid var(--green);background:var(--black);color:var(--green);
+  min-height:56px;padding:8px 9px;font-size:18px;font-weight:900;line-height:1.15}
+button:hover:not(:disabled),button:active:not(:disabled){background:var(--green);color:var(--black)}
+button.primary{background:var(--green);color:var(--black)}
+button.primary:hover:not(:disabled){background:var(--black);color:var(--green)}
+.region-results{display:flex;flex-wrap:wrap;gap:6px;max-height:84px;overflow:hidden}
 .region-results:empty{display:none}
-.region-results button{min-height:32px;font-size:11px;padding:5px 8px}
-.side{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:9px;min-height:0;min-width:0}
-.control-panel{padding:10px;display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
-.window-bar{min-height:34px;border:2px solid var(--mid);background:var(--olive);color:var(--ivory);
- display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;
- font-size:11px;line-height:1.4;font-weight:bold;letter-spacing:.7px;direction:ltr}
-.window-controls{display:flex;align-items:center;gap:4px;direction:ltr}
-.window-controls i{display:block;font-style:normal;background:var(--phosphor);height:10px;width:10px;border:2px solid var(--shadow);font-size:0}
-.form-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+.region-results button{min-height:34px;font-size:14px;padding:5px}
+.panel-head{font-size:19px;font-weight:900;line-height:1.2;padding:8px 10px;
+  background:var(--green);color:var(--black)}
+.control-panel{padding:13px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:16px}
+.form-grid{min-height:0;display:flex;flex-direction:column;gap:19px}
 .field{min-width:0}
-.field.wide{grid-column:1 / -1}
-.field label{display:block;margin:0 0 5px;font-size:12px;line-height:1.25;font-weight:bold;color:var(--amber)}
-.field select,.field input[type='text']{
- width:100%;min-height:41px;min-width:0;padding:7px;background:var(--ivory);color:var(--black);
- border:2px solid var(--mid);border-radius:0;box-shadow:none;font-size:13px;font-family:inherit;font-weight:bold;
-}
-.field input[type='text']{direction:ltr;text-align:left;font-size:14px}
-.color-options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.color-option{display:flex;align-items:center;gap:8px;min-height:39px;padding:4px 6px;border:2px solid var(--olive)}
-.color-option input{height:29px;width:34px;padding:0;border:2px solid var(--mid);background:var(--ivory);cursor:pointer}
-.color-option span{font-size:12px;font-weight:bold;color:var(--ivory)}
-.field-help{color:var(--phosphor);font-size:11px;line-height:1.4;margin-top:4px}
-.export-panel{display:grid;grid-template-rows:auto auto;gap:8px;padding:10px}
-.export-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.export-panel .save-art,.export-panel .save-help{display:none}
-.console-footer{min-height:37px;border:2px solid var(--mid);background:var(--shadow);padding:7px 11px;
- display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;color:var(--ivory);font-size:11px;line-height:1.5}
-.status{direction:rtl;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.status::before{content:'● ';color:var(--phosphor)}
-.footer-mark{color:var(--amber);font-size:11px;font-weight:bold;direction:ltr;white-space:nowrap}
+.field label{display:block;font-size:18px;line-height:1.15;font-weight:900;margin-bottom:8px}
+.field input,.field select{width:100%;min-width:0;min-height:52px;background:var(--black);
+  color:var(--green);border:3px solid var(--green);font-size:18px;font-weight:900;
+  padding:8px 11px}
+.field input{direction:ltr;text-align:left}
+.field p{margin:8px 0 0;font-size:14px;font-weight:700;line-height:1.4}
+.export{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;border-top:3px solid var(--green);padding-top:12px}
+.export button{font-size:15px;min-height:54px;padding:7px 4px}
+.console-footer{min-height:50px;border:3px solid var(--green);padding:9px 14px;
+  display:flex;align-items:center;gap:12px;justify-content:space-between;font-size:16px;font-weight:900}
+.status{min-width:0;line-height:1.3;overflow:hidden;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.foot-label{white-space:nowrap}
 .mobile-tabs{display:none}
-@media(min-width:901px) and (max-height:710px){
- .terminal{padding:7px;gap:6px}.topbar{min-height:51px;padding:4px 9px}.hud-brand h1{font-size:35px}
- .game-screen,.control-panel,.export-panel{padding:7px;gap:5px}
- .field label{font-size:11px;margin-bottom:3px}.field select,.field input[type='text']{min-height:32px;padding:4px}
- .form-grid{gap:6px}.pixel-button{min-height:38px}.qr-rack{height:min(100%,calc(100dvh - 240px))}
-}
 @media(max-width:900px){
- .terminal{padding:8px 9px max(8px,env(safe-area-inset-bottom));gap:7px;grid-template-rows:auto minmax(0,1fr) auto auto}
- .topbar{min-height:53px;grid-template-columns:1fr auto;padding:5px 9px;border-width:2px;gap:6px}
- .hud-brand{gap:10px}.hud-brand h1{font-size:39px;letter-spacing:-4px}.hud-brand .sub{font-size:10px}
- .top-center{display:none}.hud-right{font-size:10px;gap:6px}.hud-dots b{width:9px;height:9px}
- .display{display:block;position:relative;min-height:0}
- .game-screen,.control-panel,.export-panel{height:100%;width:100%;padding:9px;border-width:2px}
- .game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:6px}
- .section-head{min-height:23px;font-size:11px;padding-bottom:5px}
- .qr-rack{height:min(100%,calc(100vw - 48px));max-height:calc(100% - 16px);max-width:calc(100% - 20px);border-width:4px;padding:5px}
- .stage-tip{font-size:10px;gap:4px}.pixel-button{min-height:48px;padding:6px 4px;font-size:13px}
- .tools-row{gap:5px}.region-results{max-height:65px;gap:5px}.region-results button{min-height:34px}
- .side{display:contents}.control-panel,.export-panel{display:none}
- html[data-view='style'] .game-screen,html[data-view='save'] .game-screen{display:none}
- html[data-view='style'] .control-panel{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
- html[data-view='save'] .export-panel{display:flex;flex-direction:column;justify-content:flex-start;gap:13px}
- .control-panel .form-grid{grid-template-columns:1fr 1fr;gap:11px;align-content:start}
- .field label{font-size:13px;margin-bottom:6px}.field select,.field input[type='text']{min-height:46px;font-size:15px}
- .color-option{min-height:47px}.color-option span{font-size:13px}.field-help{font-size:12px}
- .export-panel .export-actions{grid-template-columns:1fr;gap:12px}
- .export-panel .pixel-button{font-size:16px;min-height:54px}
- .export-panel .save-art{display:grid;place-items:center;min-height:90px;background:var(--black);
-  border:2px solid var(--mid);font-size:44px;line-height:1;color:var(--amber)}
- .export-panel .save-help{display:block;font-size:13px;line-height:1.5;color:var(--ivory);border:2px solid var(--mid);padding:12px}
- .mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:49px}
- .mobile-tabs button{min-height:49px;background:var(--olive);color:var(--ivory);border:2px solid var(--mid);
-  font:bold 13px 'Courier New',Courier,monospace;padding:5px}
- .mobile-tabs button[aria-selected='true']{background:var(--phosphor);color:var(--black);border-color:var(--ivory)}
- .console-footer{min-height:41px;display:block;padding:7px 9px;font-size:11px}
- .footer-mark{display:none}.status{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;line-height:1.35}
+ .terminal{padding:8px;gap:8px;grid-template-rows:auto minmax(0,1fr) auto auto}
+ .topbar{min-height:59px;padding:8px 12px;border-width:2px}
+ .brand h1{font-size:43px}.brand .label{font-size:12px}
+ .hud{font-size:14px}
+ .display{display:block;position:relative}
+ .game-screen,.control-panel{width:100%;height:100%;border-width:2px}
+ .game-screen{padding:8px;gap:8px;grid-template-rows:auto minmax(0,1fr) auto auto}
+ .section-head{font-size:17px;padding-bottom:5px;border-width:2px}
+ .section-head .right{font-size:12px}
+ .playfield{border-width:2px}
+ .qr-rack{width:min(calc(100% - 14px),calc(100dvh - 235px));padding:5px;border-width:3px}
+ .tools-row{gap:5px}
+ .tools-row button{font-size:15px;min-height:50px;padding:4px 3px;border-width:2px}
+ .region-results{max-height:76px}
+ .region-results button{font-size:12px}
+ .control-panel{display:none;padding:12px;gap:12px}
+ html[data-view="controls"] .game-screen{display:none}
+ html[data-view="controls"] .control-panel{display:grid}
+ .panel-head{font-size:20px}
+ .form-grid{gap:15px}
+ .field label{font-size:20px;margin-bottom:7px}
+ .field input,.field select{font-size:19px;min-height:54px}
+ .field p{font-size:15px}
+ .export{gap:6px;padding-top:11px}
+ .export button{font-size:15px;min-height:54px}
+ .mobile-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .mobile-tabs button{min-height:53px;font-size:20px;border-width:2px}
+ .mobile-tabs button[aria-selected="true"]{color:var(--black);background:var(--green)}
+ .console-footer{min-height:48px;padding:8px 10px;font-size:14px;border-width:2px}
+ .foot-label{display:none}
 }
 @media(max-width:900px) and (max-height:680px){
- .terminal{padding:5px 7px;gap:5px}.topbar{min-height:42px}.hud-brand h1{font-size:30px}.hud-brand .sub{font-size:8px}
- .game-screen{padding:6px;gap:4px}.section-head{font-size:10px;min-height:20px}
- .pixel-button{min-height:43px;font-size:12px}.console-footer{min-height:34px;font-size:10px;padding:5px 7px}
- .mobile-tabs,.mobile-tabs button{min-height:44px}
- .field select,.field input[type='text']{min-height:39px;font-size:14px}
- .control-panel .form-grid{gap:7px}.field label{font-size:12px;margin-bottom:4px}
- .field-help{font-size:11px;line-height:1.3}
- .export-panel .save-art{display:none}.export-panel .save-help{font-size:12px;padding:9px}
+ .terminal{padding:5px;gap:5px}
+ .topbar{min-height:49px;padding:4px 9px}
+ .brand h1{font-size:35px}.brand .label{font-size:11px}.hud{font-size:12px}
+ .game-screen{gap:5px;padding:5px}
+ .section-head{font-size:15px;min-height:21px}
+ .tools-row button{min-height:45px;font-size:13px}
+ .mobile-tabs button{min-height:46px;font-size:18px}
+ .console-footer{min-height:39px;font-size:12px;padding:5px 7px}
+ .qr-rack{width:min(calc(100% - 12px),calc(100dvh - 205px))}
+ .control-panel{gap:8px;padding:8px}
+ .form-grid{gap:10px}
+ .field label{font-size:17px;margin-bottom:4px}
+ .field input,.field select{min-height:44px;font-size:17px;padding:5px}
+ .field p{font-size:13px}
+ .export button{font-size:13px;min-height:44px}
 }
 @media(max-width:900px) and (orientation:landscape) and (max-height:520px){
- .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 103px;gap:5px}
- .topbar{grid-column:1/3;min-height:34px}.display{grid-column:1;grid-row:2}
- .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);min-height:0}
- .console-footer{grid-column:1/3;grid-row:3;min-height:29px}
- .game-screen{grid-template-columns:minmax(0,1fr) minmax(190px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
- .game-screen .section-head{grid-column:1/3}.playfield{grid-column:1;grid-row:2}
- .stage-tip{display:none}.tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
- .region-results{position:absolute;bottom:5px;left:5px;right:5px;max-height:40px;background:var(--black)}
- .qr-rack{height:min(100%,calc(100dvh - 93px));max-width:100%}
- .control-panel .form-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
- .control-panel .field.wide{grid-column:span 3}
- .control-panel .field:nth-child(2),.control-panel .field:nth-child(3),.control-panel .field:nth-child(4),.control-panel .field:nth-child(5){grid-column:span 1}
- .control-panel .field:nth-child(6){grid-column:span 2}.control-panel .field-help{display:none}
- .export-panel .export-actions{grid-template-columns:repeat(3,1fr)}.export-panel .pixel-button{min-height:44px;font-size:12px}
- .export-panel .save-art{display:none}.export-panel .save-help{font-size:11px;padding:8px}
+ .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 125px}
+ .topbar{grid-row:1;grid-column:1/3;min-height:40px}
+ .display{grid-row:2;grid-column:1}
+ .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+ .console-footer{grid-column:1/3;grid-row:3;min-height:30px}
+ .game-screen{grid-template-columns:minmax(0,1fr) minmax(165px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
+ .game-screen .section-head{grid-row:1;grid-column:1/3}
+ .playfield{grid-column:1;grid-row:2}
+ .tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
+ .region-results{position:absolute;left:5px;right:5px;bottom:5px;background:var(--black);max-height:45px}
+ .qr-rack{width:min(calc(100% - 10px),calc(100dvh - 85px))}
+ .control-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto minmax(0,1fr);gap:5px}
+ .panel-head{grid-column:1/3;grid-row:1;font-size:16px;padding:3px 8px}
+ .form-grid{grid-column:1;grid-row:2;gap:6px}
+ .field label{font-size:12px;margin-bottom:2px}
+ .field input,.field select{min-height:30px;font-size:13px;padding:2px}
+ .field p{display:none}
+ .export{grid-column:2;grid-row:2;grid-template-columns:1fr;gap:4px;align-content:center;border:0;padding:0}
+ .export button{min-height:35px;font-size:12px}
 }
 </style>
 </head>
 <body>
 <main class="terminal">
  <header class="topbar">
-  <div class="hud-brand">
-   <h1 dir="ltr"><em>q</em>Art</h1>
-   <div class="sub">Q.A. / 55<br>EXPERIMENTAL</div>
-  </div>
-  <div class="top-center">ELECTRONIC COMPUTING LABORATORY<br><small>INSTRUMENT NO. 055 / DATA ENCODING UNIT</small></div>
-  <div class="hud-right"><span>POWER: ON</span><div class="hud-dots" aria-hidden="true"><b></b><b></b><b></b></div></div>
+  <div class="brand"><h1>qArt</h1><div class="label">MATRIX<br>EDITOR</div></div>
+  <div class="hud">SYSTEM READY ■</div>
  </header>
  <div class="display">
-  <section class="game-screen" aria-label="תצוגת מכונת הקידוד">
-   <div class="section-head"><span>CRT-01 / MATRIX DISPLAY</span><span class="state">BEAM: STABLE</span></div>
-   <div class="playfield"><div class="qr-rack"><div id="qr" aria-label="קוד QR לעריכה"></div></div></div>
-   <div class="stage-tip"><span>ALTER MATRIX ELEMENTS DIRECTLY</span><span>● LOCKED: STRUCTURE</span></div>
+  <section class="game-screen" aria-label="QR matrix editor">
+   <div class="section-head"><span>01 / MATRIX</span><span class="right">EDIT MODE</span></div>
+   <div class="playfield"><div class="qr-rack"><div id="qr" aria-label="Editable QR code"></div></div></div>
    <div class="tools-row">
-    <button id="regions" class="pixel-button primary" title="חיפוש שטחים שניתן למחוק">חיפוש שטחים</button>
-    <button id="editable" class="pixel-button" title="סימון ריבועים שניתן להפוך">סימון ריבועים</button>
-    <button id="reset" class="pixel-button" title="איפוס הקוד">איפוס</button>
+    <button id="regions" class="primary">FIND SPACE</button>
+    <button id="editable">SAFE PIXELS</button>
+    <button id="reset">RESET</button>
    </div>
-   <div id="regionResults" class="region-results" aria-label="שטחים שנמצאו"></div>
+   <div id="regionResults" class="region-results" aria-label="Erasable regions"></div>
   </section>
-  <div class="side">
-   <section class="control-panel" aria-labelledby="control-title">
-    <div class="window-bar"><span id="control-title">INPUT REGISTERS / UNIT 02</span><span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span></div>
-    <div class="form-grid">
-     <div class="field wide"><label for="data">01 — INPUT SIGNAL / ADDRESS</label><input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false" inputmode="url"></div>
-     <div class="field"><label for="mask">02 — MATRIX VARIANT</label><select id="mask"><option value="0">Variant 01</option><option value="1">Variant 02</option><option value="2">Variant 03</option><option value="3">Variant 04</option><option value="4">Variant 05</option><option value="5">Variant 06</option><option value="6">Variant 07</option><option value="7">Variant 08</option></select></div>
-     <div class="field"><label for="level">03 — REDUNDANCY</label><select id="level"><option value="H">H / HIGH</option><option value="Q">Q / MED-HIGH</option><option value="M">M / MEDIUM</option><option value="L">L / LOW</option></select></div>
-     <div class="field"><label for="dots">04 — ELEMENT FORM</label><select id="dots"><option value="square">SQUARE</option><option value="rounded">ROUND</option><option value="dots">DOT</option><option value="classy">OCTAGON</option><option value="extra-rounded">SOFT SQUARE</option></select></div>
-     <div class="field"><label for="corners">05 — LOCATOR FORM</label><select id="corners"><option value="square">SQUARE</option><option value="extra-rounded">ROUND</option><option value="dot">CIRCLE</option><option value="star">STAR</option></select></div>
-     <div class="field wide"><label>06 — PHOSPHOR / PAPER COLORS</label><div class="color-options"><div class="color-option"><input id="foreground" type="color" value="#241a27" aria-label="צבע הקוד"><span>MARKS</span></div><div class="color-option"><input id="background" type="color" value="#ffffff" aria-label="צבע הרקע"><span>PAPER</span></div></div></div>
-     <div class="field wide"><div class="field-help">CHANGING VARIANT OR REDUNDANCY RESETS THE MATRIX. VERIFY READABILITY BEFORE PRINTING.</div></div>
+  <section class="control-panel" aria-label="Controls">
+   <div class="panel-head">02 / CONTROLS</div>
+   <div class="form-grid">
+    <div class="field"><label for="data">LINK OR TEXT</label><input id="data" type="text" value="https://example.com" spellcheck="false" placeholder="https://..."></div>
+    <div class="field"><label for="mask">PATTERN</label>
+     <select id="mask"><option value="0">Pattern 1</option><option value="1">Pattern 2</option><option value="2">Pattern 3</option><option value="3">Pattern 4</option><option value="4">Pattern 5</option><option value="5">Pattern 6</option><option value="6">Pattern 7</option><option value="7">Pattern 8</option></select>
     </div>
-   </section>
-   <section class="export-panel" aria-label="בדיקות ופלט">
-    <div class="window-bar"><span>OUTPUT REGISTERS / UNIT 03</span><span class="window-controls" aria-hidden="true"><i></i></span></div>
-    <div class="export-actions"><button id="scan" class="pixel-button green">בדיקת סריקה</button><button id="png" class="pixel-button">הורדת PNG</button><button id="svg" class="pixel-button">הורדת SVG</button></div>
-    <div class="save-art" aria-hidden="true">▦ 055 ▦</div>
-    <div class="save-help">הפלט מיוצר לפי נתוני המטריצה המקוריים, לא לפי רזולוציית המסך. יש לבדוק את הקוד גם במצלמת טלפון לפני הדפסה.</div>
-   </section>
-  </div>
+    <div class="field"><label for="level">ERROR CORRECTION</label>
+     <select id="level"><option value="H">High</option><option value="Q">Medium-high</option><option value="M">Medium</option><option value="L">Low</option></select>
+     <p>Changing the pattern or correction level resets your drawing.</p>
+    </div>
+   </div>
+   <div class="export">
+    <button id="scan">SCAN TEST</button>
+    <button id="png">PNG ↓</button>
+    <button id="svg">SVG ↓</button>
+   </div>
+  </section>
  </div>
- <nav class="mobile-tabs" aria-label="בחירת יחידת עבודה">
-  <button type="button" data-tab="play" aria-selected="true">01 / מסך</button>
-  <button type="button" data-tab="style" aria-selected="false">02 / בקרה</button>
-  <button type="button" data-tab="save" aria-selected="false">03 / פלט</button>
+ <nav class="mobile-tabs" aria-label="Screens">
+  <button type="button" data-tab="play" aria-selected="true">MATRIX</button>
+  <button type="button" data-tab="controls" aria-selected="false">CONTROLS</button>
  </nav>
- <footer class="console-footer"><div id="status" class="status" role="status" aria-live="polite">INITIALIZING MATRIX…</div><span class="footer-mark">1955 / QART / EXPERIMENTAL ELECTRONIC DATA UNIT</span></footer>
+ <footer class="console-footer"><div id="status" class="status" role="status" aria-live="polite">READY</div><div class="foot-label">BLACK / GREEN ONLY</div></footer>
 </main>
 <script src="qr-engine.js"></script>
 <script src="regions.js"></script>
 <script src="app.js"></script>
 <script>
 (function(){
- const tabs=document.querySelectorAll('[data-tab]');
- function show(name){
-  document.documentElement.dataset.view=name;
-  tabs.forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===name)));
- }
- tabs.forEach(button=>button.addEventListener('click',()=>show(button.dataset.tab)));
+ const buttons=document.querySelectorAll('[data-tab]');
+ function show(view){document.documentElement.dataset.view=view;
+  buttons.forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===view)))}
+ buttons.forEach(button=>button.addEventListener('click',()=>show(button.dataset.tab)));
  show('play');
 }());
 </script>
