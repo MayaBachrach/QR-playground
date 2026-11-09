@@ -1,27 +1,30 @@
-# QR Playground
+# qArt
 
-An interactive QR drawing playground. Start with a destination URL, choose one of eight valid QR mask patterns for the same content, then click modules to draw black/white sequences.
+An experimental, low-resolution QR matrix editor inspired by early computing instruments.
+
+The interface and generated QR use only **black (`#000000`) and marker green (`#39ff14`)**. The QR has fixed square modules and standard square finders. There are no color, dot-shape, or corner selectors, and no logo uploads.
 
 ## Features
-- Eight valid encodings of the exact same input, without adding tracking parameters or changing the destination.
-- Direct module editing, using QR error correction. Every proposed flip is decoded against the original input; failed changes are reverted.
-- Finder, separator, timing, alignment, format and version modules are locked.
-- Optional highlights sample up to 48 editable modules across the current code and test each single flip. Highlights are cleared after any edit; combinations are always checked again.
-- Star decorations in the three finder centers. The outer square rings and a four-module quiet zone are preserved.
-- Existing dot styles, colors, correction levels, PNG and SVG exports. Exports contain the drawing without editing highlights.
-- Local scan checking works without BarcodeDetector. URLs and drawings stay in the browser. There are no image/logo uploads.
 
-## Run and build
-Serve this directory with any static web server, for example `python -m http.server 8765`. GitHub Pages serves the committed files directly.
+- Generate standard QR symbols for a URL or text and switch among eight mask patterns without changing the content.
+- Choose an error-correction level. Changing the mask or correction level resets manual pixel edits.
+- Edit individual non-reserved modules. Each change is decoded before it is accepted; unsuccessful edits are rolled back.
+- Search for separately validated regions that can be erased and preview before committing the deletion.
+- Sample individually editable modules for visual guides (test again after every change).
+- Decode the actual black/green SVG locally, export standard PNG or SVG, and use a full-screen low-resolution interface with nearest-neighbor enlargement.
+- Desktop fits the main work and control panels on one page. Mobile uses **MATRIX** and **CONTROLS** screens rather than shrinking all buttons. No document scrolling.
 
-The QR engine is bundled locally; no CDN or network request is needed to generate or decode a QR after loading the site.
+## Run
 
-To rebuild: `npm ci && npm run build`. To verify rendered QR decoding: `npm test`.
+Serve as static files, for example `python -m http.server 8765`.
+GitHub Pages serves the committed site directly.
 
-## Scanning limits
-The large-area search checks erasing whole rectangles, preserves protected modules, and expands successful candidates. It highlights up to three alternatives sorted by area. This bounded search does not guarantee the mathematical global maximum. Choose an alternative, then use the erase button; erasure is checked again. Any edit invalidates the results. Run `node test-regions.cjs` for search invariants.
+The QR engine (`qr-engine.js`) is bundled locally and no external CDN is needed. To rebuild it: `npm ci && npm run build`.
 
-Error correction works on codewords, not a fixed percentage of editable squares. A successful local decode does not guarantee reliable phone scanning or print performance. Test the finished design on several devices at its intended size. Styling can reduce the available correction margin. Changing the input, correction level, or mask resets the drawing.
+Run `npm test` for square-module QR decoding tests across different contents, error-correction levels, and masks. Run `node test-regions.cjs` for region-search invariants.
 
-## Dependencies
-`qrcode` (MIT) and `jsqr` (Apache-2.0) are included in `qr-engine.js`; see `THIRD_PARTY_LICENSES.txt`. esbuild builds the bundle. The renderer tests use resvg and pngjs.
+## Readability and scanning
+
+The visible interface is captured into a reduced canvas and enlarged with nearest-neighbor scaling, without changing exported SVG/PNG data. Browser fallback shows the normal interactive DOM if low-resolution screen capture is unavailable.
+
+Bright green on black can look different from black on green in a scanner, so the QR itself uses **black squares on the green background** with a four-module quiet zone. A passing browser decoder does not guarantee that all phone cameras or print conditions will scan the QR. Test with a real camera at the intended size.
