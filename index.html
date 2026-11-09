@@ -276,6 +276,37 @@ button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-v
   .save-help{padding:8px;font-size:11px}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* The native DOM is the interaction plane; lowres.js renders the visible
+   framebuffer at a hard pixel budget and nearest-neighbor scales it up.
+   Keep native layout geometric: no smooth gradients, blur or rounded UI. */
+body{background:#010b05!important}
+.terminal{
+ background-color:#04190d!important;
+ background-image:
+  linear-gradient(90deg,#0d2d18 1px,transparent 1px),
+  linear-gradient(#0d2d18 1px,transparent 1px)!important;
+ background-size:12px 12px!important
+}
+.playfield{
+ background-color:#071f13!important;
+ background-image:
+  linear-gradient(90deg,#123723 50%,transparent 50%),
+  linear-gradient(#123723 50%,transparent 50%)!important;
+ background-size:18px 18px!important
+}
+.game-screen,.control-panel,.export-panel,.topbar{
+ border-radius:0!important;
+ box-shadow:inset 0 0 0 3px #173b28,4px 4px 0 #000!important
+}
+.pixel-button,.field select,.field input,.mobile-tabs button{
+ border-radius:0!important;text-shadow:none!important;filter:none!important
+}
+@media (min-width:901px){
+ .field label,.stage-tip,.console-footer{font-size:13px}
+ .window-bar,.section-head{font-size:14px}
+ .field select,.field input[type="text"]{font-size:14px}
+}
 </style>
 </head>
 <body>
@@ -373,5 +404,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-v
   showTab('play');
 }());
 </script>
+<script src="lowres.js"></script>
 </body>
 </html>
