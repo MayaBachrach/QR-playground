@@ -1,495 +1,373 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#27243c">
-  <meta name="description" content="qArt — סטודיו פיקסלים ליצירת QR שהוא גם אמנות.">
-  <title>qArt — QR meets Art</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&family=Rubik+Pixels&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      font-family: "Rubik", Arial, sans-serif;
-      color: #24263e;
-      background: #bde6e0;
-      --ink: #24263e;
-      --deep: #171d32;
-      --shell: #36314d;
-      --pink: #fb6dab;
-      --pink-dark: #d74785;
-      --yellow: #ffdf75;
-      --mint: #9ee7cc;
-      --paper: #fffaf1;
-      --shadow: #171d32;
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-width: 300px;
-      min-height: 100vh;
-      background:
-        linear-gradient(90deg, #fff7 1px, transparent 1px),
-        linear-gradient(#fff7 1px, transparent 1px),
-        linear-gradient(180deg, #a8dcd9 0%, #c7ece4 55%, #ffe8ca 100%);
-      background-size: 24px 24px, 24px 24px, auto;
-      overflow-x: hidden;
-    }
-    body::before, body::after {
-      position: fixed;
-      content: "";
-      z-index: -1;
-      width: 18px;
-      height: 18px;
-      background: var(--yellow);
-      box-shadow: 18px 0 var(--yellow), -18px 0 var(--yellow), 0 18px var(--yellow), 0 -18px var(--yellow);
-      transform: rotate(12deg);
-      pointer-events: none;
-    }
-    body::before { top: 19%; left: 5%; }
-    body::after { top: 48%; right: 5%; width: 12px; height: 12px; background: var(--pink); box-shadow: 12px 0 var(--pink), -12px 0 var(--pink), 0 12px var(--pink), 0 -12px var(--pink); }
-    button, input, select { font: inherit; }
-    button, select { cursor: pointer; }
-    button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
-    button:focus-visible, select:focus-visible, input:focus-visible, #qr [data-cell]:focus-visible {
-      outline: 3px solid #fff; outline-offset: 4px;
-      box-shadow: 0 0 0 7px var(--pink);
-    }
-    .site-header {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 19px clamp(16px, 3vw, 42px) 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-    .mini-brand { display: flex; gap: 12px; align-items: center; font-size: 14px; font-weight: 800; }
-    .mini-icon {
-      color: var(--deep);
-      font: 19px/1 "Press Start 2P", monospace;
-      background: var(--yellow);
-      border: 3px solid var(--deep);
-      padding: 11px 9px 10px;
-      box-shadow: 4px 4px 0 var(--deep);
-    }
-    .header-tag { font: 10px/1.7 "Press Start 2P", monospace; color: #3e5272; direction: ltr; text-align: left; }
-    .arcade {
-      width: min(1420px, calc(100% - 40px));
-      margin: 0 auto;
-      padding-bottom: 18px;
-      filter: drop-shadow(0 15px 0 #3344571f);
-    }
-    .marquee {
-      position: relative;
-      isolation: isolate;
-      margin: 0 45px;
-      padding: 18px 32px 25px;
-      color: var(--deep);
-      text-align: center;
-      background: var(--yellow);
-      border: 8px solid var(--deep);
-      border-bottom: 0;
-      border-radius: 23px 23px 0 0;
-      box-shadow: inset 0 0 0 6px #ffa7be, inset 0 0 0 12px #ffeeb6;
-      overflow: hidden;
-    }
-    .marquee::before, .marquee::after {
-      position: absolute;
-      content: "✦  ✦  ✦";
-      top: 35px;
-      font-size: 23px;
-      line-height: 2;
-      color: var(--pink-dark);
-      letter-spacing: 13px;
-    }
-    .marquee::before { right: 3%; } .marquee::after { left: 3%; }
-    .marquee .eyebrow, .pixel-label {
-      font: 10px/1.8 "Press Start 2P", monospace;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      direction: ltr;
-    }
-    .marquee .eyebrow { color: #8e3762; }
-    h1 {
-      margin: 12px 0 5px;
-      font: clamp(46px, 6.6vw, 91px)/1.2 "Press Start 2P", monospace;
-      letter-spacing: -8px;
-      direction: ltr;
-      text-shadow: 6px 6px 0 #fff9ea, 9px 9px 0 #e86f9f;
-    }
-    h1 .accent { color: #ed4c98; }
-    .marquee p { margin: 8px 0 0; font-size: 15px; font-weight: 700; }
-    .cabinet {
-      background: var(--shell);
-      border: 10px solid var(--deep);
-      border-radius: 9px 9px 22px 22px;
-      padding: clamp(12px, 2vw, 26px);
-      box-shadow: inset 0 0 0 5px #655b79, 0 11px 0 #14192c, 0 17px 0 #8585a4;
-    }
-    .cabinet-topline {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: #ffe6ab;
-      padding: 2px 6px 18px;
-    }
-    .cabinet-topline .pixel-label { font-size: 9px; }
-    .lights { display: flex; gap: 9px; direction: ltr; }
-    .lights span { width: 11px; height: 11px; background: #ff8a97; box-shadow: 2px 2px 0 #161b2e; }
-    .lights span:nth-child(2) { background: var(--yellow); }
-    .lights span:nth-child(3) { background: var(--mint); }
-    .cabinet-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(295px, .83fr);
-      align-items: stretch;
-      gap: clamp(12px, 1.6vw, 24px);
-    }
-    .preview, .panel { min-width: 0; }
-    .preview {
-      display: flex;
-      flex-direction: column;
-      padding: clamp(14px, 2vw, 26px);
-      background: #17283e;
-      border: 5px solid #10192c;
-      box-shadow: inset 0 0 0 4px #405473;
-      color: #effff6;
-    }
-    .preview-heading, .panel-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 0 0 16px;
-    }
-    h2 { margin: 0; font-size: clamp(18px, 1.7vw, 23px); font-weight: 800; }
-    .preview-heading h2 { color: var(--yellow); }
-    .preview .pixel-label { font-size: 9px; color: #a1e8cf; }
-    .screen {
-      background: #83d4bb;
-      border: 7px solid #10192c;
-      box-shadow: inset 0 0 0 5px #367e80, 5px 5px 0 #0b1827;
-      padding: clamp(11px, 1.4vw, 23px);
-    }
-    .screen-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 0 0 12px;
-      color: #164b55;
-      font: 9px/1.7 "Press Start 2P", monospace;
-      direction: ltr;
-    }
-    .on-air { display: flex; align-items: center; gap: 8px; }
-    .on-air::before { content: ""; width: 9px; height: 9px; background: #f05282; box-shadow: 2px 2px 0 #27576a; }
-    .artboard {
-      display: grid;
-      place-items: center;
-      width: min(100%, 560px);
-      aspect-ratio: 1;
-      margin: 0 auto;
-      padding: clamp(6px, 1.2vw, 14px);
-      background: #fff;
-      border: 5px solid #e3f0e5;
-      box-shadow: 4px 4px 0 #347975;
-    }
-    #qr { display: grid; place-items: center; width: 100%; height: 100%; touch-action: manipulation; }
-    #qr svg, #qr canvas { display: block; width: 100%; height: auto; max-height: 100%; }
-    #qr [data-cell] { cursor: pointer; }
-    #qr [data-cell]:focus { outline: none; stroke: #e6007e; stroke-width: .15; }
-    .screen-foot {
-      font: 9px/1.5 "Press Start 2P", monospace;
-      text-align: center;
-      margin-top: 14px;
-      letter-spacing: 1px;
-      color: #174f53;
-    }
-    .workspace-label { margin: 25px 0 12px; color: var(--yellow); font-size: 15px; font-weight: 800; }
-    .actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 11px; }
-    button {
-      min-height: 46px;
-      border: 3px solid var(--deep);
-      border-radius: 3px;
-      background: var(--pink);
-      color: var(--deep);
-      padding: 10px 14px;
-      font-weight: 800;
-      font-size: 13px;
-      box-shadow: 4px 4px 0 #0f1627;
-      transition: transform .13s ease, box-shadow .13s ease, background .13s ease;
-    }
-    button:hover:not(:disabled) { background: #ff9ac5; transform: translate(-1px, -2px); box-shadow: 5px 6px 0 #0f1627; }
-    button:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #0f1627; }
-    button.secondary { background: #d4e9e6; color: #1d3349; }
-    button.secondary:hover:not(:disabled) { background: #fff0bf; }
-    .primary-actions > button:first-child { background: var(--yellow); flex: 1.15 1 200px; }
-    .primary-actions > button { flex: 1 1 150px; }
-    .export-actions > button { flex: 1 1 135px; }
-    .status {
-      min-height: 52px;
-      margin: 17px 0;
-      padding: 13px 14px;
-      background: #263e53;
-      color: #ddfff2;
-      border-right: 5px solid #9ce6ca;
-      font-size: 13px;
-      line-height: 1.65;
-    }
-    .hint { margin: 11px 0 17px; font-size: 12px; line-height: 1.7; color: #b9d3d7; }
-    .region-options { margin: 5px 0 14px; }
-    .region-options:empty { display: none; }
-    .region-options button { background: #d6dbff; }
-    .panel {
-      background: var(--paper);
-      color: var(--ink);
-      border: 5px solid #131b2f;
-      box-shadow: inset 0 0 0 4px #ffce99;
-      padding: clamp(18px, 2vw, 29px);
-    }
-    .panel-heading {
-      padding-bottom: 18px;
-      border-bottom: 3px dashed #d8c4d0;
-      margin-bottom: 22px;
-    }
-    .panel-heading .pixel-label {
-      font-size: 9px;
-      background: var(--yellow);
-      border: 2px solid var(--deep);
-      padding: 7px;
-    }
-    .field { margin-bottom: 21px; }
-    .field label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 9px; }
-    input[type="text"], select {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      min-height: 46px;
-      border: 3px solid var(--deep);
-      border-radius: 2px;
-      background: #fff;
-      color: var(--ink);
-      font-size: 14px;
-      padding: 10px 12px;
-      box-shadow: 3px 3px 0 #dbccd0;
-    }
-    input[type="text"] { direction: ltr; text-align: left; }
-    .panel .hint { color: #695f70; margin: 9px 0 0; }
-    .colors {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 9px;
-    }
-    .color-chip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 2px solid #d6cbd2; background: #fff; }
-    input[type="color"] { width: 40px; height: 36px; padding: 0; border: 0; background: transparent; cursor: pointer; }
-    .colors small { color: #4b4254; font-size: 12px; font-weight: 700; }
-    .note {
-      padding: 14px;
-      margin-top: 10px;
-      color: #604057;
-      background: #ffe6e5;
-      border-right: 4px solid #d74785;
-      font-size: 12px;
-      line-height: 1.75;
-    }
-    .deck {
-      margin: 22px 10px 2px;
-      padding: 17px 14px 11px;
-      border-top: 5px solid #77718a;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      min-height: 90px;
-    }
-    .deck-text { font: 10px/2.1 "Press Start 2P", monospace; color: #f5d2e8; direction: ltr; }
-    .deck-text strong { color: var(--yellow); }
-    .joystick { position: relative; width: 75px; height: 56px; flex: none; }
-    .joystick::before { content: ""; position: absolute; left: 18px; bottom: 0; width: 58px; height: 17px; background: #1c2136; border: 4px solid #0e1426; box-shadow: 3px 3px 0 #8b7d9c; }
-    .joystick::after { content: ""; position: absolute; left: 39px; bottom: 16px; height: 31px; width: 10px; background: var(--yellow); border: 2px solid var(--deep); box-shadow: 0 -12px 0 5px #fc77a9; }
-    .deck-coins { display: flex; gap: 12px; }
-    .deck-coins span { display: block; width: 24px; height: 24px; border-radius: 50%; background: #fe8baa; border: 4px solid #14192c; box-shadow: 3px 3px 0 #181628; }
-    .deck-coins span:nth-child(2) { background: #f7d46f; } .deck-coins span:nth-child(3) { background: #a0e7d3; }
-    .site-footer { max-width: 1400px; margin: 27px auto 17px; padding: 0 22px; color: #4d5361; text-align: center; font-size: 12px; line-height: 1.8; }
-    .site-footer b { font-family: "Press Start 2P", monospace; font-size: 11px; }
-    @media (max-width: 1080px) {
-      .cabinet-layout { grid-template-columns: minmax(0, 1fr) minmax(270px, .78fr); }
-      .marquee::before, .marquee::after { font-size: 14px; letter-spacing: 6px; }
-      .panel { padding: 20px; }
-      .preview { padding: 17px; }
-    }
-    @media (max-width: 850px) {
-      .cabinet-layout { grid-template-columns: minmax(0, 1fr); }
-      .preview { order: 0; }
-      .panel { order: 1; }
-      .marquee { margin: 0 20px; }
-      .artboard { width: min(100%, 510px); }
-      .cabinet { padding: 14px; }
-    }
-    @media (max-width: 500px) {
-      body { background-size: 16px 16px, 16px 16px, auto; }
-      .site-header { padding: 14px 15px 15px; }
-      .mini-brand { gap: 9px; font-size: 12px; }
-      .mini-icon { padding: 8px; font-size: 15px; }
-      .header-tag { font-size: 8px; }
-      .arcade { width: calc(100% - 16px); }
-      .marquee { margin: 0 12px; border-width: 5px; padding: 15px 8px 19px; border-radius: 10px 10px 0 0; box-shadow: inset 0 0 0 3px #ffa7be, inset 0 0 0 7px #ffeeb6; }
-      .marquee .eyebrow { font-size: 8px; }
-      .marquee::before, .marquee::after { content: "✦"; font-size: 16px; top: 40px; }
-      .marquee::before { right: 7%; } .marquee::after { left: 7%; }
-      h1 { font-size: clamp(39px, 12vw, 56px); letter-spacing: -5px; text-shadow: 4px 4px 0 #fff9ea, 6px 6px 0 #e86f9f; }
-      .marquee p { font-size: 11px; }
-      .cabinet { border-width: 6px; padding: 8px; box-shadow: inset 0 0 0 3px #655b79, 0 7px 0 #14192c; }
-      .cabinet-topline { padding: 6px 5px 10px; }
-      .cabinet-topline .pixel-label { font-size: 7px; }
-      .preview { padding: 10px; border-width: 3px; box-shadow: inset 0 0 0 2px #405473; }
-      .preview-heading, .panel-heading { gap: 8px; margin-bottom: 13px; }
-      .preview-heading h2, .panel-heading h2 { font-size: 17px; }
-      .preview .pixel-label { font-size: 7px; }
-      .screen { padding: 8px; border-width: 4px; box-shadow: inset 0 0 0 3px #367e80, 3px 3px 0 #0b1827; }
-      .screen-head { font-size: 7px; }
-      .artboard { padding: 5px; border-width: 3px; box-shadow: 3px 3px 0 #347975; }
-      .screen-foot { font-size: 7px; margin-top: 12px; }
-      .workspace-label { margin: 20px 0 12px; }
-      .actions { gap: 9px; }
-      .primary-actions > button, .export-actions > button { flex: 1 1 100%; }
-      button { font-size: 12px; padding: 11px; min-height: 47px; }
-      .panel { padding: 15px; border-width: 3px; }
-      .panel-heading .pixel-label { font-size: 7px; }
-      .deck { padding: 11px 0 0; margin: 14px 2px 0; min-height: 62px; }
-      .deck-text { font-size: 7px; }
-      .joystick { transform: scale(.75); transform-origin: left center; width: 55px; }
-      .deck-coins { gap: 5px; }
-      .deck-coins span { width: 17px; height: 17px; border-width: 3px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      button { transition: none; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06140e">
+<meta name="description" content="qArt — a retro QR art game. Make a QR code that is your own.">
+<title>qArt — INSERT CREATIVITY</title>
+<style>
+:root {
+  color-scheme:dark;
+  --bg:#06140e;--dark:#071b12;--shade:#102b1d;--grid:#1b4730;
+  --green:#5eff96;--soft:#bdf9c5;--cyan:#7be9e2;--amber:#f8d66f;
+  --red:#ff807b;--white:#e9ffe3;--edge:#34694e;
+  --mono:"Courier New",Courier,monospace;--ui:Tahoma,Verdana,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{
+  background:var(--bg);
+  font-family:var(--mono);color:var(--green);
+  background-image:
+    radial-gradient(ellipse at 45% 60%,#17452e 0%,#081a12 58%,#020b08 100%),
+    repeating-linear-gradient(0deg,transparent 0 5px,#0d291b 5px 6px);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled,input:disabled,select:disabled{opacity:.54;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{
+  outline:3px dashed var(--amber);outline-offset:3px
+}
+.terminal{
+  position:relative;isolation:isolate;
+  width:100%;height:100dvh;min-height:0;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  gap:10px;padding:clamp(10px,1.3vw,22px);
+  background:
+    linear-gradient(90deg,transparent 23px,#0c3521 24px,transparent 25px),
+    linear-gradient(transparent 23px,#0c3521 24px,transparent 25px);
+  background-size:24px 24px;
+}
+.terminal::after{
+  content:"";position:absolute;inset:0;z-index:9;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,#0002 4px);
+  opacity:.48;
+}
+.topbar{
+  min-height:68px;border:3px solid var(--green);position:relative;
+  background:#062317;box-shadow:inset 0 0 0 3px #1e5537,4px 4px 0 #010b06;
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;gap:14px;padding:8px 17px;
+}
+.hud-brand{display:flex;gap:15px;align-items:center;min-width:0;direction:ltr;justify-content:flex-start}
+.hud-brand h1{
+  font-family:var(--mono);font-size:clamp(32px,3.8vw,58px);font-weight:900;
+  line-height:1;margin:0;letter-spacing:-5px;color:var(--green);
+  text-shadow:3px 3px 0 #064327,6px 6px 0 #000;
+}
+.hud-brand h1 em{color:var(--amber);font-style:normal}
+.hud-brand .sub{color:var(--cyan);font-size:10px;line-height:1.5;font-weight:700}
+.top-center{text-align:center;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--soft)}
+.top-center small{display:block;font-size:10px;color:var(--green);padding-top:4px}
+.hud-right{display:flex;justify-content:flex-end;align-items:center;gap:15px;font-size:12px;font-weight:700;direction:ltr}
+.hud-dots{display:flex;gap:4px}.hud-dots b{width:10px;height:10px;background:var(--green);box-shadow:2px 2px #000}
+.hud-dots b:nth-child(2){background:var(--amber)}.hud-dots b:nth-child(3){background:var(--red)}
+.display{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,370px);gap:12px}
+.game-screen,.control-panel,.export-panel{
+  border:3px solid var(--green);min-width:0;min-height:0;position:relative;
+  background:rgba(3,18,12,.95);
+  box-shadow:inset 0 0 0 3px #143925,4px 4px 0 #010b06;
+}
+.game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:9px;padding:12px}
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:28px;
+  border-bottom:2px dashed #397958;padding:0 2px 6px;
+  font-size:12px;line-height:1.2;letter-spacing:.5px;font-weight:900;direction:ltr;
+}
+.section-head .state{color:var(--amber)}
+.playfield{
+  min-height:0;min-width:0;display:flex;justify-content:center;align-items:center;
+  position:relative;overflow:hidden;
+  background:
+    linear-gradient(#0f3523 1px,transparent 1px),
+    linear-gradient(90deg,#0f3523 1px,transparent 1px),
+    radial-gradient(ellipse at center,#123b27,#04160d 77%);
+  background-size:18px 18px,18px 18px,auto;border:2px solid #26623d;
+}
+.playfield::before,.playfield::after{
+  content:"";width:23px;height:23px;position:absolute;z-index:2;pointer-events:none;
+  border:4px solid var(--amber)
+}
+.playfield::before{top:8px;right:8px;border-bottom:0;border-left:0}
+.playfield::after{bottom:8px;left:8px;border-top:0;border-right:0}
+.qr-rack{
+  flex:none;max-width:calc(100% - 32px);max-height:calc(100% - 20px);
+  height:min(100%,calc(100vw - 490px));aspect-ratio:1;
+  border:5px solid #1e723f;padding:8px;background:#e7ffdf;
+  box-shadow:0 0 0 4px #04150a,8px 8px 0 #010d06;
+}
+#qr{width:100%;height:100%;display:grid;place-items:center;touch-action:manipulation}
+#qr svg,#qr canvas{width:100%;height:100%;max-width:100%;max-height:100%;display:block}
+#qr [data-cell]{cursor:crosshair}
+#qr [data-cell]:focus{outline:none;stroke:#e6007e;stroke-width:.15}
+.stage-tip{
+  display:flex;gap:10px;align-items:center;justify-content:space-between;
+  color:var(--soft);font-size:11px;line-height:1.3;font-weight:700;direction:ltr;
+}
+.stage-tip span:last-child{color:var(--amber)}
+.tools-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.pixel-button{
+  border:2px solid #0a100b;border-radius:0;
+  min-height:46px;padding:6px 9px;background:#c4c4c4;color:#101510;
+  box-shadow:inset 2px 2px #fff,inset -2px -2px #666,3px 3px #020b06;
+  font-family:var(--ui);font-weight:800;font-size:12px;line-height:1.3;
+  text-shadow:none;white-space:normal;
+}
+.pixel-button:hover:not(:disabled){background:#fff1ad}
+.pixel-button:active:not(:disabled){box-shadow:inset -2px -2px #fff,inset 2px 2px #555;transform:translate(2px,2px)}
+.pixel-button.primary{background:var(--amber)}.pixel-button.primary:hover:not(:disabled){background:#ffeaaa}
+.pixel-button.green{background:#81e79b}
+.region-results{display:flex;flex-wrap:wrap;gap:7px;align-items:center;min-height:0;max-height:100px;overflow:hidden}
+.region-results:empty{display:none}
+.region-results button{font-size:11px;min-height:32px;padding:3px 7px;background:#b6e6c1}
+.side{
+  display:grid;grid-template-rows:minmax(0,1fr) auto;gap:12px;min-height:0;min-width:0
+}
+.control-panel{padding:12px;display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px}
+.window-bar{
+  background:#0c703c;border:2px solid #6ed993;
+  padding:7px 9px;min-height:36px;
+  display:flex;align-items:center;justify-content:space-between;gap:9px;
+  font-family:var(--mono);font-size:12px;font-weight:900;color:#e5ffdb;direction:ltr
+}
+.window-controls{display:flex;gap:3px}
+.window-controls i{display:grid;place-items:center;font-style:normal;background:#bdbdbd;color:#101010;
+  border:2px solid #000;box-shadow:inset 1px 1px #fff,inset -1px -1px #727272;
+  height:18px;width:19px;font-size:12px;line-height:1
+}
+.form-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+.field{min-width:0}
+.field.wide{grid-column:1 / -1}
+.field label{display:block;margin:0 0 5px;font-size:11px;font-weight:900;color:var(--soft);line-height:1.2}
+.field select,.field input[type="text"]{
+  width:100%;min-width:0;min-height:40px;padding:7px;
+  background:#c8e9c5;color:#101810;border:2px solid #102419;border-radius:0;
+  box-shadow:inset 2px 2px #729077,inset -2px -2px #eaffdf;
+  font:700 13px/1.1 var(--ui);
+}
+.field input[type="text"]{font:700 14px var(--mono);direction:ltr;text-align:left}
+.color-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.color-option{min-width:0;display:flex;align-items:center;gap:8px;background:#193b29;padding:5px}
+.color-option input{flex:none;width:36px;height:34px;border:2px solid #57c983;background:#eee;padding:1px;cursor:pointer}
+.color-option span{font-size:11px;color:var(--soft);font-weight:800}
+.field-help{margin-top:6px;color:#a2dbb5;font-size:11px;line-height:1.35}
+.export-panel{padding:11px;display:grid;grid-template-rows:auto auto;gap:10px}
+.export-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.console-footer{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
+  min-height:36px;padding:6px 11px;border:2px solid #276e47;
+  background:#06140e;color:var(--soft);font-size:11px;line-height:1.4;
+}
+.status{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+.status::before{content:"■ ";color:var(--green)}
+.footer-mark{white-space:nowrap;color:var(--amber);font-weight:900;direction:ltr}
+.mobile-tabs{display:none}
+.desktop-only{display:initial}
+@media (max-height:710px) and (min-width:901px){
+  .terminal{gap:7px;padding:8px}
+  .topbar{min-height:50px;padding:5px 10px}
+  .hud-brand h1{font-size:36px}
+  .game-screen,.control-panel{padding:7px;gap:6px}
+  .field select,.field input[type="text"]{min-height:32px;padding:4px}
+  .form-grid{gap:7px}
+  .field label{margin-bottom:3px}
+  .qr-rack{height:min(100%,calc(100dvh - 235px))}
+  .pixel-button{min-height:38px}
+  .export-panel{padding:7px}
+}
+@media (max-width:900px){
+  .terminal{
+    padding:8px 9px max(8px,env(safe-area-inset-bottom));
+    gap:7px;grid-template-rows:auto minmax(0,1fr) auto auto;
+  }
+  .topbar{
+    grid-template-columns:1fr auto;min-height:51px;padding:5px 9px;
+    border-width:2px;box-shadow:inset 0 0 0 2px #205a39
+  }
+  .hud-brand h1{font-size:37px;letter-spacing:-4px}
+  .hud-brand .sub{font-size:9px}
+  .top-center{display:none}
+  .hud-right{font-size:10px;gap:9px}
+  .hud-dots b{width:8px;height:8px}
+  .display{display:block;position:relative;min-height:0}
+  .game-screen,.control-panel,.export-panel{
+    height:100%;width:100%;padding:9px;border-width:2px;box-shadow:inset 0 0 0 2px #183e28
+  }
+  .game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:7px}
+  .section-head{min-height:23px;font-size:11px;padding-bottom:5px}
+  .playfield{min-height:0}
+  .qr-rack{
+    height:min(100%,calc(100vw - 46px));max-height:calc(100% - 16px);
+    max-width:calc(100% - 18px);
+    border-width:4px;padding:5px;box-shadow:0 0 0 3px #04150a,4px 4px #010d06
+  }
+  .stage-tip{font-size:10px;gap:4px}
+  .tools-row{gap:5px}
+  .pixel-button{min-height:46px;padding:6px 3px;font-size:11px}
+  .region-results{max-height:70px;gap:5px}
+  .region-results button{min-height:34px}
+  .side{display:contents}
+  .control-panel,.export-panel{display:none}
+  html[data-view="style"] .game-screen,html[data-view="save"] .game-screen{display:none}
+  html[data-view="style"] .control-panel{display:grid;grid-template-rows:auto 1fr;gap:10px}
+  html[data-view="save"] .export-panel{display:flex;flex-direction:column;justify-content:flex-start;gap:15px}
+  .control-panel .form-grid{grid-template-columns:1fr 1fr;gap:11px;align-content:start}
+  .field label{font-size:12px;margin-bottom:6px}
+  .field select,.field input[type="text"]{min-height:45px;font-size:15px}
+  .color-option{min-height:47px}
+  .color-option span{font-size:12px}
+  .field-help{font-size:12px}
+  .export-panel .export-actions{grid-template-columns:1fr;gap:12px}
+  .export-panel .pixel-button{font-size:15px;min-height:55px}
+  .save-help{font-size:14px;line-height:1.65;color:var(--soft);border:2px dashed #2c7b4d;padding:14px}
+  .save-art{display:grid;place-items:center;min-height:100px;background:#0c291a;border:2px solid var(--green);font-size:52px;color:var(--amber);text-shadow:5px 5px #000}
+  .mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:49px}
+  .mobile-tabs button{
+    border:2px solid #255a39;min-height:49px;background:#102c1c;color:#93d5a9;
+    font:900 12px var(--mono);padding:5px;
+  }
+  .mobile-tabs button[aria-selected="true"]{background:#51eb86;color:#061b0d;border-color:#91ffb2;box-shadow:inset 0 -5px #2a9250}
+  .console-footer{min-height:42px;display:block;padding:8px;font-size:11px}
+  .footer-mark{display:none}
+  .status{white-space:normal;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .desktop-only{display:none}
+}
+@media (max-width:900px) and (max-height:680px){
+  .terminal{padding:5px 7px;gap:5px}
+  .topbar{min-height:42px}
+  .hud-brand h1{font-size:29px}
+  .hud-brand .sub{font-size:8px}
+  .game-screen{padding:6px;gap:5px}
+  .section-head{font-size:10px;min-height:19px}
+  .pixel-button{min-height:43px;font-size:10px}
+  .console-footer{min-height:35px;padding:5px 7px;font-size:10px}
+  .mobile-tabs,.mobile-tabs button{min-height:44px}
+  .field select,.field input[type="text"]{min-height:39px}
+  .control-panel .form-grid{gap:7px}
+  .field label{font-size:11px;margin-bottom:3px}
+  .field-help{font-size:10px;margin-top:3px}
+}
+@media (max-width:900px) and (orientation:landscape) and (max-height:520px){
+  .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 108px;gap:6px}
+  .topbar{grid-column:1/3;min-height:35px}
+  .display{grid-column:1;grid-row:2}
+  .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);min-height:0}
+  .console-footer{grid-column:1/3;grid-row:3;min-height:30px}
+  .game-screen{grid-template-columns:minmax(0,1fr) minmax(210px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
+  .game-screen .section-head{grid-column:1/3}
+  .playfield{grid-column:1;grid-row:2}
+  .stage-tip{display:none}
+  .tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
+  .region-results{position:absolute;bottom:7px;left:7px;right:7px;background:#00170c;max-height:46px}
+  .qr-rack{height:min(100%,calc(100dvh - 95px));max-width:100%}
+  .control-panel .form-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .control-panel .field.wide{grid-column:span 3}
+  .control-panel .field:nth-child(2),.control-panel .field:nth-child(3),.control-panel .field:nth-child(4),.control-panel .field:nth-child(5){grid-column:span 1}
+  .control-panel .field:nth-child(6){grid-column:span 2}
+  .control-panel .field-help{display:none}
+  .export-panel .export-actions{grid-template-columns:repeat(3,1fr)}
+  .export-panel .pixel-button{min-height:44px}
+  .save-art{display:none}
+  .save-help{padding:8px;font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="mini-brand"><span class="mini-icon" aria-hidden="true">✳</span><span>THE PIXEL ART ARCADE</span></div>
-    <span class="header-tag">EST. 2026 · INSERT CREATIVITY</span>
+<main class="terminal">
+  <header class="topbar">
+    <div class="hud-brand">
+      <h1 dir="ltr"><em>q</em>Art</h1>
+      <div class="sub">QR + ART<br>VERSION 1.0</div>
+    </div>
+    <div class="top-center" aria-hidden="true">*** INSERT CREATIVITY ***<small>THE QR EDITOR / 8-BIT SYSTEM</small></div>
+    <div class="hud-right"><span>1UP&nbsp;● READY</span><div class="hud-dots" aria-hidden="true"><b></b><b></b><b></b></div></div>
   </header>
 
-  <main class="arcade" aria-label="qArt — מכונת ארקייד לעיצוב קוד QR">
-    <div class="marquee">
-      <div class="eyebrow">WELCOME TO THE QR ART MACHINE</div>
-      <h1 aria-label="qArt"><span class="accent">q</span>Art</h1>
-      <p>קיו־ארט: כשהקוד הופך לאמנות ✦</p>
-    </div>
-
-    <div class="cabinet">
-      <div class="cabinet-topline" aria-hidden="true">
-        <span class="pixel-label">PLAYER 01 / CREATE MODE</span>
-        <div class="lights"><span></span><span></span><span></span></div>
+  <div class="display">
+    <section class="game-screen" aria-label="מסך היצירה של qArt">
+      <div class="section-head"><span>01 / PIXEL CANVAS</span><span class="state">EDIT MODE : ON</span></div>
+      <div class="playfield">
+        <div class="qr-rack"><div id="qr" aria-label="קוד QR לעריכה"></div></div>
       </div>
+      <div class="stage-tip"><span>CLICK PIXELS TO DRAW / SAFE CELLS ONLY</span><span>● SCAN CHECKED</span></div>
+      <div class="tools-row">
+        <button id="regions" class="pixel-button primary" title="מציאת שטחים למחיקה">חיפוש שטחים</button>
+        <button id="editable" class="pixel-button" title="סימון ריבועים שאפשר לשנות">סימון ריבועים</button>
+        <button id="reset" class="pixel-button" title="איפוס ציור ה־QR">איפוס ציור ↺</button>
+      </div>
+      <div id="regionResults" class="region-results" aria-label="שטחים למחיקה שנמצאו"></div>
+    </section>
 
-      <div class="cabinet-layout">
-        <section class="preview" aria-labelledby="preview-title">
-          <div class="preview-heading">
-            <h2 id="preview-title">מסך היצירה</h2>
-            <span class="pixel-label">LEVEL 01</span>
+    <div class="side">
+      <section class="control-panel" aria-labelledby="control-title">
+        <div class="window-bar"><span id="control-title">QART.EXE / SETTINGS</span><span class="window-controls" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span></div>
+        <div class="form-grid">
+          <div class="field wide"><label for="data">01 // קישור או טקסט</label>
+            <input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false" inputmode="url">
           </div>
-
-          <div class="screen">
-            <div class="screen-head"><span class="on-air">LIVE CANVAS</span><span>QR / ART</span></div>
-            <div class="artboard"><div id="qr" aria-label="תצוגה מקדימה של קוד QR"></div></div>
-            <div class="screen-foot">MAKE SOMETHING SCANNABLE ✳</div>
+          <div class="field"><label for="mask">02 // דוגמה</label>
+            <select id="mask"><option value="0">דוגמה 1</option><option value="1">דוגמה 2</option><option value="2">דוגמה 3</option><option value="3">דוגמה 4</option><option value="4">דוגמה 5</option><option value="5">דוגמה 6</option><option value="6">דוגמה 7</option><option value="7">דוגמה 8</option></select>
           </div>
-
-          <h3 class="workspace-label">✦ כלי המשחק</h3>
-          <div class="actions primary-actions">
-            <button id="regions">מציאת שטחים גדולים למחיקה</button>
-            <button class="secondary" id="editable">סימון ריבועים לשינוי</button>
-            <button class="secondary" id="reset">איפוס הציור ↺</button>
+          <div class="field"><label for="level">03 // תיקון שגיאות</label>
+            <select id="level"><option value="H">H — גבוהה</option><option value="Q">Q — גבוהה-בינונית</option><option value="M">M — בינונית</option><option value="L">L — נמוכה</option></select>
           </div>
-          <p class="hint">לחצי על ריבוע ב־QR כדי להפוך אותו ולצייר. אפשר גם עם Tab ו־Enter. ריבועי המבנה נעולים; כל שינוי נבדק מחדש כדי לוודא שהקוד עדיין נסרק.</p>
-          <div id="regionResults" class="actions region-options" aria-label="שטחים שנמצאו"></div>
-          <p class="hint">השטחים שמוצגים הם חלופות שנבדקו בנפרד. אחרי מחיקה אפשר לחפש שוב. החיפוש מוגבל ולא מבטיח את השטח הגדול ביותר האפשרי.</p>
-          <p class="status" id="status" role="status" aria-live="polite">מכינים את הקוד…</p>
-
-          <h3 class="workspace-label">✦ שומרים את היצירה</h3>
-          <div class="actions export-actions">
-            <button id="png">הורדת PNG ↓</button>
-            <button class="secondary" id="svg">הורדת SVG ↓</button>
-            <button class="secondary" id="scan">בדיקת סריקה ✓</button>
+          <div class="field"><label for="dots">04 // צורת ריבועים</label>
+            <select id="dots"><option value="square">ריבועים</option><option value="rounded">מעוגלים</option><option value="dots">עיגולים</option><option value="classy">יהלומים</option><option value="extra-rounded">מעוגלים מאוד</option></select>
           </div>
-          <p class="hint">בדיקת הסריקה מפענחת את העיצוב כאן בדפדפן. מומלץ לבדוק גם בטלפון ובגודל ההדפסה האמיתי.</p>
-        </section>
-
-        <section class="panel" aria-labelledby="panel-title">
-          <div class="panel-heading"><h2 id="panel-title">לוח הבקרה</h2><span class="pixel-label">CONTROLS</span></div>
-          <div class="field">
-            <label for="data">לאן הקוד מוביל?</label>
-            <input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false">
-            <p class="hint">קישורים קצרים יוצרים בדרך כלל קוד פשוט יותר.</p>
+          <div class="field"><label for="corners">05 // פינות</label>
+            <select id="corners"><option value="square">מרובעות</option><option value="extra-rounded">מעוגלות</option><option value="dot">עיגולים</option><option value="star">כוכבים ★</option></select>
           </div>
-          <div class="field">
-            <label for="mask">בחרי דוגמה</label>
-            <select id="mask">
-              <option value="0">דוגמה 1</option><option value="1">דוגמה 2</option>
-              <option value="2">דוגמה 3</option><option value="3">דוגמה 4</option>
-              <option value="4">דוגמה 5</option><option value="5">דוגמה 6</option>
-              <option value="6">דוגמה 7</option><option value="7">דוגמה 8</option>
-            </select>
-            <p class="hint">כל הדוגמאות מקודדות אותו תוכן. החלפה מאפסת את הציור.</p>
-          </div>
-          <div class="field">
-            <label for="dots">צורת הפיקסלים</label>
-            <select id="dots">
-              <option value="square">ריבועים קלאסיים</option>
-              <option value="rounded">ריבועים מעוגלים</option>
-              <option value="dots">עיגולים</option>
-              <option value="classy">יהלומים עדינים</option>
-              <option value="extra-rounded">מעוגל במיוחד</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="corners">צורת הפינות</label>
-            <select id="corners">
-              <option value="square">מרובעות</option>
-              <option value="extra-rounded">מעוגלות</option>
-              <option value="dot">עיגולים</option>
-              <option value="star">כוכבים ✦</option>
-            </select>
-            <p class="hint">במצב כוכבים המסגרת המרובעת נשארת כדי לעזור לסריקה.</p>
-          </div>
-          <div class="field">
-            <label>צבעי הקוד</label>
-            <div class="colors">
-              <div class="color-chip"><input id="foreground" type="color" value="#241a27" aria-label="צבע הקוד"><small>פיקסלים</small></div>
-              <div class="color-chip"><input id="background" type="color" value="#ffffff" aria-label="צבע הרקע"><small>רקע</small></div>
+          <div class="field wide"><label>06 // צבעי הפיקסלים</label>
+            <div class="color-options">
+              <div class="color-option"><input id="foreground" type="color" value="#241a27" aria-label="צבע קוד"><span>קוד</span></div>
+              <div class="color-option"><input id="background" type="color" value="#ffffff" aria-label="צבע רקע"><span>רקע</span></div>
             </div>
           </div>
-          <div class="field">
-            <label for="level">תיקון שגיאות</label>
-            <select id="level">
-              <option value="H">H — גבוהה</option><option value="Q">Q — בינונית-גבוהה</option>
-              <option value="M">M — בינונית</option><option value="L">L — נמוכה</option>
-            </select>
-          </div>
-          <div class="note">טיפ מהארקייד: גם קוד תקני עלול להפסיק להיסרק אחרי שינויי צבע וצורה. כדאי לבדוק בכמה מכשירים, במיוחד לפני הדפסה.</div>
-        </section>
-      </div>
+          <div class="field wide"><div class="field-help">שינוי דוגמה או רמת תיקון שגיאות מאפס את הציור. פינות כוכב שומרות על המסגרת. מומלץ לבדוק סריקה אחרי כל עיצוב.</div></div>
+        </div>
+      </section>
 
-      <div class="deck" aria-hidden="true">
-        <div class="joystick"></div>
-        <div class="deck-text"><strong>qArt</strong> · GAME ON<br>CREATE / PLAY / REPEAT</div>
-        <div class="deck-coins"><span></span><span></span><span></span></div>
-      </div>
+      <section class="export-panel" aria-label="שמירה ובדיקת סריקה">
+        <div class="window-bar"><span>OUTPUT.DAT / SAVE GAME</span><span class="window-controls" aria-hidden="true"><i>✓</i></span></div>
+        <div class="export-actions">
+          <button class="pixel-button green" id="scan">בדיקת סריקה</button>
+          <button class="pixel-button" id="png">הורדת PNG ↓</button>
+          <button class="pixel-button" id="svg">הורדת SVG ↓</button>
+        </div>
+        <div class="save-art" aria-hidden="true">▦ ★ ▦</div>
+        <div class="save-help">ה־QR נבדק בדפדפן עצמו. לפני הדפסה כדאי לבדוק סריקה גם עם מצלמת הטלפון ובגודל ההדפסה המיועד. אין צורך בהעלאת תמונה.</div>
+      </section>
     </div>
-  </main>
-
-  <footer class="site-footer"><b>qArt</b> · אמנות שאפשר לסרוק · הקישורים והציורים נשארים בדפדפן שלך</footer>
-  <script src="qr-engine.js"></script>
-  <script src="regions.js"></script>
-  <script src="app.js"></script>
+  </div>
+  <nav class="mobile-tabs" aria-label="מעבר בין מסכים">
+    <button type="button" data-tab="play" aria-selected="true">▶ יצירה</button>
+    <button type="button" data-tab="style" aria-selected="false">▦ עיצוב</button>
+    <button type="button" data-tab="save" aria-selected="false">↓ שמירה</button>
+  </nav>
+  <footer class="console-footer">
+    <div class="status" id="status" role="status" aria-live="polite">READY · מכינים את הקוד…</div>
+    <span class="footer-mark">qArt // GAME ON // NO TRACKING</span>
+  </footer>
+</main>
+<script src="qr-engine.js"></script>
+<script src="regions.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  const tabs = document.querySelectorAll('[data-tab]');
+  function showTab(name) {
+    document.documentElement.dataset.view = name;
+    tabs.forEach(function (button) {
+      button.setAttribute('aria-selected', String(button.dataset.tab === name));
+    });
+  }
+  tabs.forEach(function (button) {
+    button.addEventListener('click', function () { showTab(button.dataset.tab); });
+  });
+  showTab('play');
+}());
+</script>
 </body>
 </html>
