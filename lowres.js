@@ -10,8 +10,8 @@
  screen.id='lowResScreen';
  screen.setAttribute('aria-hidden','true');
  screen.style.cssText='position:fixed;inset:0;width:100vw;height:100dvh;'+
-  'z-index:100;pointer-events:none;visibility:hidden;background:#06120a;'+
-  'image-rendering:pixelated;';
+  'z-index:100;pointer-events:none;visibility:hidden;background:#000000;'+
+  'image-rendering:pixelated;filter:contrast(10000%) hue-rotate(-8deg) saturate(85%) brightness(110%);';
  document.body.append(screen);
  const ctx=screen.getContext('2d',{alpha:false});
  if(!ctx){screen.remove();return}
@@ -21,10 +21,9 @@
  const escape=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
 
- // Restrict interface colors to seven 1955 instrument phosphors/paints.
- // The QR preview and selectable swatches preserve user-defined colors.
- const PALETTE=[[6,18,10],[13,33,17],[42,67,39],[65,106,59],
-  [131,232,146],[229,243,205],[211,181,104]];
+ // Strict black/marker-green only. CSS high-contrast provides a secure
+ // visual fallback when SVG foreignObject taints canvas readback.
+ const PALETTE=[[0,0,0],[57,255,20]];
  function inside(rect,x,y,step){
   if(!rect)return false;
   const xx=(x+.5)*step,yy=(y+.5)*step;
@@ -33,11 +32,7 @@
  function quantize(dim){
   const frame=ctx.getImageData(0,0,dim.pw,dim.ph);
   const pixels=frame.data;
-  const qr=source.querySelector('.qr-rack')?.getBoundingClientRect();
-  const swatches=Array.from(source.querySelectorAll('input[type=color]'))
-   .map(node=>node.getBoundingClientRect());
   for(let y=0;y<dim.ph;y++)for(let x=0;x<dim.pw;x++){
-   if(inside(qr,x,y,dim.block)||swatches.some(rect=>inside(rect,x,y,dim.block)))continue;
    const i=(y*dim.pw+x)*4,r=pixels[i],g=pixels[i+1],b=pixels[i+2];
    let best=0,min=Infinity;
    for(let k=0;k<PALETTE.length;k++){
@@ -89,7 +84,7 @@
   if(!r.width||!r.height)return;
   const len=typeof el.selectionStart==='number'?el.selectionStart:el.value.length;
   const x=Math.min(r.right-10,r.left+12+len*8);
-  ctx.fillStyle='#d3b568';
+  ctx.fillStyle='#39ff14';
   ctx.fillRect(Math.round(x/dim.block),
    Math.round((r.top+(r.height-15)/2)/dim.block),1,Math.max(5,Math.round(15/dim.block)));
  }
@@ -111,7 +106,7 @@
    image.onload=()=>{
     try{
      ctx.imageSmoothingEnabled=false;
-     ctx.fillStyle='#06120a';
+     ctx.fillStyle='#000000';
      ctx.fillRect(0,0,screen.width,screen.height);
      ctx.drawImage(image,0,0,screen.width,screen.height);
      try{quantize(dim)}catch(e){/* Keep nearest-neighbor output when browser blocks canvas readback. */}
