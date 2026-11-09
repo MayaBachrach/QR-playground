@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Chaos Lab</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#110d18;color:#faf4ff;font-family:Arial,sans-serif}main{max-width:1060px;margin:auto;padding:24px}a{color:#ff9ad0}h1{font-size:clamp(28px,5vw,54px);margin:20px 0 5px}p{color:#c8b8d0;line-height:1.6}.layout{display:grid;grid-template-columns:320px 1fr;gap:22px;margin-top:25px}.panel{background:#21182b;border:1px solid #43344e;border-radius:20px;padding:20px}label{display:block;margin:15px 0 7px;font-weight:bold}input,select,button{width:100%;padding:12px;border-radius:9px;border:1px solid #66506d;font-size:15px}input,select{background:#130f1a;color:white}button{background:#ff278d;color:white;font-weight:bold;cursor:pointer;border:0;margin-top:12px}button.secondary{background:#44314f}#art{background:white;padding:12px;border-radius:12px;max-width:500px;margin:auto}#art svg{width:100%;display:block}#result{font-size:15px;min-height:45px}small{color:#b9a4c5}.modes{display:grid;grid-template-columns:1fr 1fr;gap:7px}.modes button{margin:0;background:#42314e}.modes button.active{background:#f02b8c}.range{display:flex;justify-content:space-between}footer{padding:25px 0;color:#aa9bb1}@media(max-width:750px){.layout{grid-template-columns:1fr}}
+</style></head><body><main>
+<a href="./">← חזרה ל־Playground</a><h1>QR CHAOS LAB ✳</h1><p>כמה אפשר להרוס QR לפני שהוא מפסיק לעבוד? בחרי ניסוי, הזיזי את העוצמה, ונסי לפענח. כל הניסויים משתמשים באותו מידע ובתיקון שגיאות H.</p>
+<div class="layout"><section class="panel"><label for="data">המידע שנקודד</label><input id="data" value="https://example.com" dir="ltr">
+<label>סוג הניסוי</label><div class="modes" id="modes"></div>
+<label for="power">עוצמת השיבוש <span id="powerText">30%</span></label><input id="power" type="range" min="0" max="100" value="30">
+<label for="mask">מסכת QR</label><select id="mask"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select>
+<button id="test">🔎 בדיקת פענוח</button><button class="secondary" id="download">הורדת SVG לניסוי בטלפון</button><p id="result" role="status">מוכנים לניסוי.</p><small>בדיקת הדפדפן משתמשת ב־BarcodeDetector אם הוא זמין. תוצאה חיובית אינה מבטיחה סריקה בכל טלפון. תוצאה שלילית עשויה לנבוע גם ממגבלת הדפדפן.</small></section>
+<section class="panel"><div id="art"></div><p id="description"></p><small>תצוגת QR אמיתית שנוצרת מהמידע שהזנת, לא איור דמה. שינויי המבנה מכוונים ועלולים לשבור את הקוד.</small></section></div><footer>ניסוי אמנותי · QR Playground</footer></main>
+<script src="qr-engine.js"></script><script>
+const $=id=>document.getElementById(id),ns='http://www.w3.org/2000/svg';
+const modes=[['stars','כוכבים בפינות','המרכזים של שלוש הפינות הופכים לכוכבים הולכים וקטנים.'],['missing','פינות נמחקות','מוחקים בהדרגה את המסגרת החיצונית של שלוש הפינות.'],['tiny','נקודות זעירות','מקטינים את כל תאי המידע לנקודות.'],['shift','רעידת אדמה','מזיזים כל תא מידע מעט ממקומו.'],['holes','חורים אקראיים','מוחקים חלק מתאי המידע הכהים באופן דטרמיניסטי.'],['rotate','יהלומים','מסובבים את תאי המידע בהדרגה.'],['fade','ניגודיות נעלמת','מבהירים את כל הקוד עד שכמעט נעלם.'],['quiet','בלי שוליים','מקטינים את השוליים הלבנים סביב הקוד.']];
+let mode='stars',svg;
+function node(tag,attrs){const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
+function finder(x,y,n){return (x<7&&y<7)||(x>=n-7&&y<7)||(x<7&&y>=n-7)}
+function draw(){
+ const p=+$('power').value/100; $('powerText').textContent=Math.round(p*100)+'%';
+ $('description').textContent=modes.find(m=>m[0]===mode)[2];
+ const code=QREngine.create($('data').value||' ',{errorCorrectionLevel:'H',maskPattern:+$('mask').value}),n=code.modules.size;
+ const margin=mode==='quiet'?4*(1-p):4;
+ svg=node('svg',{xmlns:ns,viewBox:`${-margin} ${-margin} ${n+2*margin} ${n+2*margin}`,'aria-label':'קוד QR ניסיוני'});
+ svg.append(node('rect',{x:-margin,y:-margin,width:n+2*margin,height:n+2*margin,fill:'white'}));
+ const gray=mode==='fade'?Math.round(18+230*p):18,fg=`rgb(${gray},${gray},${gray})`;
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+  if(!code.modules.data[y*n+x])continue;
+  if(finder(x,y,n)&&['stars','missing'].includes(mode))continue;
+  const reserved=!!code.modules.reservedBit[y*n+x];
+  if(mode==='holes'&&!reserved&&((x*53+y*97+x*y*7)%101)<p*65)continue;
+  const sz=mode==='tiny'&&!reserved?Math.max(.08,1-p*.92):1;
+  const dx=mode==='shift'&&!reserved?Math.sin(x*17+y*13)*p*.65:0;
+  const dy=mode==='shift'&&!reserved?Math.cos(x*11+y*19)*p*.65:0;
+  const e=node('rect',{x:x+(1-sz)/2+dx,y:y+(1-sz)/2+dy,width:sz,height:sz,fill:fg,rx:mode==='tiny'?sz/2:0});
+  if(mode==='rotate'&&!reserved)e.setAttribute('transform',`rotate(${p*45} ${x+.5} ${y+.5})`);
+  svg.append(e);
+ }
+ if(['stars','missing'].includes(mode))for(const [x,y] of [[0,0],[n-7,0],[0,n-7]]){
+  if(mode==='missing'){
+   const thickness=Math.max(0,1-p*1.15);
+   if(thickness>0)svg.append(node('rect',{x:x+(1-thickness)/2,y:y+(1-thickness)/2,width:6+thickness,height:6+thickness,fill:fg,rx:.15}));
+   svg.append(node('rect',{x:x+1,y:y+1,width:5,height:5,fill:'white'}));
+   svg.append(node('rect',{x:x+2,y:y+2,width:3,height:3,fill:fg}));
+  }else{
+   svg.append(node('rect',{x,y,width:7,height:7,fill:fg,rx:p*1.5}));
+   svg.append(node('rect',{x:x+1,y:y+1,width:5,height:5,fill:'white',rx:p}));
+   const outer=2.1-p*.9,inner=outer*.48;
+   const pts=Array.from({length:10},(_,i)=>{const a=-Math.PI/2+i*Math.PI/5,r=i%2?inner:outer;return `${x+3.5+Math.cos(a)*r},${y+3.5+Math.sin(a)*r}`}).join(' ');
+   svg.append(node('polygon',{points:pts,fill:fg}));
+  }
+ }
+ $('art').replaceChildren(svg);$('result').textContent='העיצוב השתנה. לחצי על בדיקת פענוח.';
+}
+for(const [id,label] of modes){const b=document.createElement('button');b.textContent=label;b.onclick=()=>{mode=id;for(const c of $('modes').children)c.classList.toggle('active',c===b);draw()};if(id===mode)b.classList.add('active');$('modes').append(b)}
+for(const id of ['data','power','mask'])$(id).addEventListener('input',()=>{try{draw()}catch(e){$('result').textContent=e.message}});
+$('test').onclick=async()=>{
+ if(!('BarcodeDetector' in window)){$('result').textContent='הדפדפן הזה לא תומך בבדיקה מקומית. הורידי SVG ונסי לסרוק ממכשיר אחר.';return}
+ try{
+ const detector=new BarcodeDetector({formats:['qr_code']});
+ const canvas=document.createElement('canvas');canvas.width=canvas.height=1000;
+ const ctx=canvas.getContext('2d'),blob=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'});
+ const url=URL.createObjectURL(blob),img=new Image();img.src=url;await img.decode();ctx.fillStyle='white';ctx.fillRect(0,0,1000,1000);ctx.drawImage(img,0,0,1000,1000);URL.revokeObjectURL(url);
+ const found=await detector.detect(canvas);const ok=found.some(v=>v.rawValue===($('data').value||' '));
+ $('result').textContent=ok?'✅ הצליח! הדפדפן פענח בדיוק את התוכן המקורי.':'❌ לא פוענח כאן לתוכן המקורי. נסי עוצמה נמוכה יותר.';
+ }catch(e){$('result').textContent='הבדיקה אינה זמינה כאן: '+e.message}
+};
+$('download').onclick=()=>{const blob=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qr-chaos-'+mode+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+draw();
+</script></body></html>
