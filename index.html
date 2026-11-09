@@ -307,6 +307,21 @@ body{background:#010b05!important}
  .window-bar,.section-head{font-size:14px}
  .field select,.field input[type="text"]{font-size:14px}
 }
+
+/* Low resolution should not mean miniature touch controls. */
+@media (max-width:900px){
+ .pixel-button{font-size:14px!important;min-height:48px}
+ .mobile-tabs button{font-size:14px!important}
+ .field label{font-size:14px!important}
+ .field select,.field input[type="text"]{font-size:16px!important}
+ .section-head,.window-bar{font-size:13px!important}
+ .console-footer{font-size:12px!important}
+}
+@media (max-width:900px) and (max-height:680px){
+ .pixel-button{font-size:12px!important;min-height:43px}
+ .field label{font-size:12px!important}
+ .section-head{font-size:11px!important}
+}
 </style>
 </head>
 <body>
