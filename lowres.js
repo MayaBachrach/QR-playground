@@ -71,7 +71,8 @@
   if(drawing){dirty=true;return}
   drawing=true;dirty=false;
   const dim=measure();
-  screen.width=dim.pw;screen.height=dim.ph;
+  if(screen.width!==dim.pw)screen.width=dim.pw;
+  if(screen.height!==dim.ph)screen.height=dim.ph;
   let url;
   try{
    url=URL.createObjectURL(new Blob([snapshot(dim.w,dim.h)],{type:'image/svg+xml'}));
