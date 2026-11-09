@@ -1,3 +1,495 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QR Playground — סטודיו לקוד אמנותי</title><style>
-:root{font-family:Arial,'Helvetica Neue',sans-serif;color:#29242b;background:#f8f5f7}*{box-sizing:border-box}body{margin:0}header{padding:22px max(20px,calc((100vw - 1100px)/2));border-bottom:1px solid #eadfe6;background:#fff}header b{font-size:25px;letter-spacing:-1px}header span{color:#a42867}header p{margin:5px 0 0;color:#756b75;font-size:13px}main{max-width:1100px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:380px 1fr;gap:24px}.panel,.preview{background:white;border:1px solid #ece2e8;border-radius:22px;padding:24px;box-shadow:0 6px 30px #5d21400a}.panel h2,.preview h2{margin:0 0 18px;font-size:19px}.field{margin-bottom:20px}label{display:block;font-size:13px;font-weight:700;margin-bottom:9px}input[type=text],select{width:100%;padding:13px;border:1px solid #ded4dc;border-radius:10px;background:#fff;font-size:15px}input[type=range]{width:100%;accent-color:#df167d}input[type=color]{height:40px;width:55px;border:0;background:transparent;cursor:pointer}.colors{display:flex;align-items:center;gap:12px}.colors small{color:#746a74}button{border:0;border-radius:12px;padding:13px 16px;background:#e6007e;color:#fff;font-size:14px;font-weight:700;cursor:pointer}button.secondary{background:#f4e8ef;color:#92285e}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:10px}.preview{display:flex;flex-direction:column;align-items:center;text-align:center}.preview h2{align-self:flex-start}.artboard{background:white;border:1px solid #f1e8ed;border-radius:16px;padding:18px;display:grid;place-items:center;width:min(100%,460px);aspect-ratio:1}#qr{width:100%;height:100%;display:grid;place-items:center}#qr svg,#qr canvas{max-width:100%;max-height:100%}.status{margin:18px 0;color:#645862;font-size:13px;line-height:1.6}.hint{font-size:12px;color:#827680;line-height:1.6;margin:6px 0}.note{background:#fff6fa;border-radius:12px;padding:12px;color:#79415f;font-size:12px;line-height:1.7;margin-top:20px}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.file{font-size:12px;max-width:100%}footer{max-width:1100px;margin:20px auto;padding:0 20px 30px;color:#837681;font-size:12px}@media(max-width:760px){main{grid-template-columns:1fr}.panel{grid-row:1}.panel,.preview{padding:19px}header{padding:18px 20px}}
-#qr svg{width:100%;height:auto}#qr [data-cell]{cursor:pointer}#qr [data-cell]:focus{outline:none;stroke:#e6007e;stroke-width:.15}.artboard{padding:8px;margin-bottom:14px}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #a42867;outline-offset:3px}</style></head><body><header><b>QR <span>Playground</span> ✳</b><p>סטודיו קטן לקודים שאפשר להפוך לאמנות</p></header><main><section class="panel"><h2>מעצבים את הקוד</h2><div class="field"><label for="data">מה הקוד יכיל?</label><input id="data" type="text" value="https://example.com" placeholder="קישור או טקסט"><p class="hint">קישורים קצרים מאפשרים בדרך כלל קודים פשוטים יותר.</p></div><div class="field"><label for="mask">אפשרויות לאותו קישור</label><select id="mask"><option value="0">דוגמה 1</option><option value="1">דוגמה 2</option><option value="2">דוגמה 3</option><option value="3">דוגמה 4</option><option value="4">דוגמה 5</option><option value="5">דוגמה 6</option><option value="6">דוגמה 7</option><option value="7">דוגמה 8</option></select><p class="hint">כל שמונה הדוגמאות מקודדות בדיוק את אותו תוכן. החלפת דוגמה מאפסת את הציור.</p></div><div class="field"><label for="dots">צורת הריבועים</label><select id="dots"><option value="square">ריבועים קלאסיים</option><option value="rounded">ריבועים מעוגלים</option><option value="dots">עיגולים</option><option value="classy">יהלומים עדינים</option><option value="extra-rounded">מעוגל במיוחד</option></select></div><div class="field"><label for="corners">צורת הפינות</label><select id="corners"><option value="square">מרובעות</option><option value="extra-rounded">מעוגלות</option><option value="dot">עיגולים</option><option value="star">כוכבים</option></select><p class="hint">במצב כוכבים המסגרת המרובעת נשמרת כדי לעזור לסריקה.</p></div><div class="field"><label>צבעי הקוד</label><div class="colors"><input id="foreground" type="color" value="#241a27" aria-label="צבע קוד"><small>קוד</small><input id="background" type="color" value="#ffffff" aria-label="צבע רקע"><small>רקע</small></div></div><div class="field"><label for="level">רמת תיקון שגיאות</label><select id="level"><option value="H">H — גבוהה</option><option value="Q">Q — בינונית-גבוהה</option><option value="M">M — בינונית</option><option value="L">L — נמוכה</option></select></div><div class="note">חשוב: גם קוד שנוצר לפי התקן עלול להיות קשה לסריקה אחרי שינויי צבע, צורה או ציור על הריבועים. בדקי אותו בכמה מכשירים ובגודל ההדפסה המתוכנן.</div></section><section class="preview"><h2>היצירה שלך</h2><div class="artboard"><div id="qr" aria-label="תצוגה מקדימה של קוד QR"></div></div><div class="actions"><button id="regions">מציאת שטחים גדולים למחיקה</button><button class="secondary" id="editable">סימון ריבועים לשינוי</button><button class="secondary" id="reset">איפוס הציור</button></div><p class="hint">לחצי על ריבוע כדי להפוך שחור/לבן ולצייר רצף. אפשר גם Tab ו־Enter. ריבועי המבנה נעולים. הסימון מציג מדגם שנבדק לשינוי יחיד; כל לחיצה נבדקת מחדש לפני שמירתה.</p><div id="regionResults" class="actions" aria-label="שטחים שנמצאו"></div><p class="hint">השטחים הם חלופות: כל שטח נבדק למחיקה מלאה בנפרד. אחרי מחיקה מחפשים מחדש. החיפוש מוגבל ומציג את הגדולים שמצא, לא בהכרח את המקסימום האפשרי.</p><p class="status" id="status" role="status" aria-live="polite">מכינים את הקוד…</p><div class="actions"><button id="png">הורדת PNG</button><button class="secondary" id="svg">הורדת SVG</button><button class="secondary" id="scan">בדיקת סריקה בדפדפן</button></div><p class="hint">בדיקת הסריקה המקומית מפענחת את העיצוב בפועל. מומלץ לבדוק גם בטלפון ובגודל ההדפסה.</p></section></main><footer>QR Playground · כלי ניסיוני ליצירה · הקישור והציור נשארים בדפדפן שלך.</footer><script src="qr-engine.js"></script><script src="regions.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#27243c">
+  <meta name="description" content="qArt — סטודיו פיקסלים ליצירת QR שהוא גם אמנות.">
+  <title>qArt — QR meets Art</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&family=Rubik+Pixels&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      font-family: "Rubik", Arial, sans-serif;
+      color: #24263e;
+      background: #bde6e0;
+      --ink: #24263e;
+      --deep: #171d32;
+      --shell: #36314d;
+      --pink: #fb6dab;
+      --pink-dark: #d74785;
+      --yellow: #ffdf75;
+      --mint: #9ee7cc;
+      --paper: #fffaf1;
+      --shadow: #171d32;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 300px;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, #fff7 1px, transparent 1px),
+        linear-gradient(#fff7 1px, transparent 1px),
+        linear-gradient(180deg, #a8dcd9 0%, #c7ece4 55%, #ffe8ca 100%);
+      background-size: 24px 24px, 24px 24px, auto;
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      position: fixed;
+      content: "";
+      z-index: -1;
+      width: 18px;
+      height: 18px;
+      background: var(--yellow);
+      box-shadow: 18px 0 var(--yellow), -18px 0 var(--yellow), 0 18px var(--yellow), 0 -18px var(--yellow);
+      transform: rotate(12deg);
+      pointer-events: none;
+    }
+    body::before { top: 19%; left: 5%; }
+    body::after { top: 48%; right: 5%; width: 12px; height: 12px; background: var(--pink); box-shadow: 12px 0 var(--pink), -12px 0 var(--pink), 0 12px var(--pink), 0 -12px var(--pink); }
+    button, input, select { font: inherit; }
+    button, select { cursor: pointer; }
+    button:disabled, select:disabled { cursor: not-allowed; opacity: .5; }
+    button:focus-visible, select:focus-visible, input:focus-visible, #qr [data-cell]:focus-visible {
+      outline: 3px solid #fff; outline-offset: 4px;
+      box-shadow: 0 0 0 7px var(--pink);
+    }
+    .site-header {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 19px clamp(16px, 3vw, 42px) 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .mini-brand { display: flex; gap: 12px; align-items: center; font-size: 14px; font-weight: 800; }
+    .mini-icon {
+      color: var(--deep);
+      font: 19px/1 "Press Start 2P", monospace;
+      background: var(--yellow);
+      border: 3px solid var(--deep);
+      padding: 11px 9px 10px;
+      box-shadow: 4px 4px 0 var(--deep);
+    }
+    .header-tag { font: 10px/1.7 "Press Start 2P", monospace; color: #3e5272; direction: ltr; text-align: left; }
+    .arcade {
+      width: min(1420px, calc(100% - 40px));
+      margin: 0 auto;
+      padding-bottom: 18px;
+      filter: drop-shadow(0 15px 0 #3344571f);
+    }
+    .marquee {
+      position: relative;
+      isolation: isolate;
+      margin: 0 45px;
+      padding: 18px 32px 25px;
+      color: var(--deep);
+      text-align: center;
+      background: var(--yellow);
+      border: 8px solid var(--deep);
+      border-bottom: 0;
+      border-radius: 23px 23px 0 0;
+      box-shadow: inset 0 0 0 6px #ffa7be, inset 0 0 0 12px #ffeeb6;
+      overflow: hidden;
+    }
+    .marquee::before, .marquee::after {
+      position: absolute;
+      content: "✦  ✦  ✦";
+      top: 35px;
+      font-size: 23px;
+      line-height: 2;
+      color: var(--pink-dark);
+      letter-spacing: 13px;
+    }
+    .marquee::before { right: 3%; } .marquee::after { left: 3%; }
+    .marquee .eyebrow, .pixel-label {
+      font: 10px/1.8 "Press Start 2P", monospace;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      direction: ltr;
+    }
+    .marquee .eyebrow { color: #8e3762; }
+    h1 {
+      margin: 12px 0 5px;
+      font: clamp(46px, 6.6vw, 91px)/1.2 "Press Start 2P", monospace;
+      letter-spacing: -8px;
+      direction: ltr;
+      text-shadow: 6px 6px 0 #fff9ea, 9px 9px 0 #e86f9f;
+    }
+    h1 .accent { color: #ed4c98; }
+    .marquee p { margin: 8px 0 0; font-size: 15px; font-weight: 700; }
+    .cabinet {
+      background: var(--shell);
+      border: 10px solid var(--deep);
+      border-radius: 9px 9px 22px 22px;
+      padding: clamp(12px, 2vw, 26px);
+      box-shadow: inset 0 0 0 5px #655b79, 0 11px 0 #14192c, 0 17px 0 #8585a4;
+    }
+    .cabinet-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #ffe6ab;
+      padding: 2px 6px 18px;
+    }
+    .cabinet-topline .pixel-label { font-size: 9px; }
+    .lights { display: flex; gap: 9px; direction: ltr; }
+    .lights span { width: 11px; height: 11px; background: #ff8a97; box-shadow: 2px 2px 0 #161b2e; }
+    .lights span:nth-child(2) { background: var(--yellow); }
+    .lights span:nth-child(3) { background: var(--mint); }
+    .cabinet-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(295px, .83fr);
+      align-items: stretch;
+      gap: clamp(12px, 1.6vw, 24px);
+    }
+    .preview, .panel { min-width: 0; }
+    .preview {
+      display: flex;
+      flex-direction: column;
+      padding: clamp(14px, 2vw, 26px);
+      background: #17283e;
+      border: 5px solid #10192c;
+      box-shadow: inset 0 0 0 4px #405473;
+      color: #effff6;
+    }
+    .preview-heading, .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+    h2 { margin: 0; font-size: clamp(18px, 1.7vw, 23px); font-weight: 800; }
+    .preview-heading h2 { color: var(--yellow); }
+    .preview .pixel-label { font-size: 9px; color: #a1e8cf; }
+    .screen {
+      background: #83d4bb;
+      border: 7px solid #10192c;
+      box-shadow: inset 0 0 0 5px #367e80, 5px 5px 0 #0b1827;
+      padding: clamp(11px, 1.4vw, 23px);
+    }
+    .screen-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 0 12px;
+      color: #164b55;
+      font: 9px/1.7 "Press Start 2P", monospace;
+      direction: ltr;
+    }
+    .on-air { display: flex; align-items: center; gap: 8px; }
+    .on-air::before { content: ""; width: 9px; height: 9px; background: #f05282; box-shadow: 2px 2px 0 #27576a; }
+    .artboard {
+      display: grid;
+      place-items: center;
+      width: min(100%, 560px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      padding: clamp(6px, 1.2vw, 14px);
+      background: #fff;
+      border: 5px solid #e3f0e5;
+      box-shadow: 4px 4px 0 #347975;
+    }
+    #qr { display: grid; place-items: center; width: 100%; height: 100%; touch-action: manipulation; }
+    #qr svg, #qr canvas { display: block; width: 100%; height: auto; max-height: 100%; }
+    #qr [data-cell] { cursor: pointer; }
+    #qr [data-cell]:focus { outline: none; stroke: #e6007e; stroke-width: .15; }
+    .screen-foot {
+      font: 9px/1.5 "Press Start 2P", monospace;
+      text-align: center;
+      margin-top: 14px;
+      letter-spacing: 1px;
+      color: #174f53;
+    }
+    .workspace-label { margin: 25px 0 12px; color: var(--yellow); font-size: 15px; font-weight: 800; }
+    .actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 11px; }
+    button {
+      min-height: 46px;
+      border: 3px solid var(--deep);
+      border-radius: 3px;
+      background: var(--pink);
+      color: var(--deep);
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 4px 4px 0 #0f1627;
+      transition: transform .13s ease, box-shadow .13s ease, background .13s ease;
+    }
+    button:hover:not(:disabled) { background: #ff9ac5; transform: translate(-1px, -2px); box-shadow: 5px 6px 0 #0f1627; }
+    button:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #0f1627; }
+    button.secondary { background: #d4e9e6; color: #1d3349; }
+    button.secondary:hover:not(:disabled) { background: #fff0bf; }
+    .primary-actions > button:first-child { background: var(--yellow); flex: 1.15 1 200px; }
+    .primary-actions > button { flex: 1 1 150px; }
+    .export-actions > button { flex: 1 1 135px; }
+    .status {
+      min-height: 52px;
+      margin: 17px 0;
+      padding: 13px 14px;
+      background: #263e53;
+      color: #ddfff2;
+      border-right: 5px solid #9ce6ca;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .hint { margin: 11px 0 17px; font-size: 12px; line-height: 1.7; color: #b9d3d7; }
+    .region-options { margin: 5px 0 14px; }
+    .region-options:empty { display: none; }
+    .region-options button { background: #d6dbff; }
+    .panel {
+      background: var(--paper);
+      color: var(--ink);
+      border: 5px solid #131b2f;
+      box-shadow: inset 0 0 0 4px #ffce99;
+      padding: clamp(18px, 2vw, 29px);
+    }
+    .panel-heading {
+      padding-bottom: 18px;
+      border-bottom: 3px dashed #d8c4d0;
+      margin-bottom: 22px;
+    }
+    .panel-heading .pixel-label {
+      font-size: 9px;
+      background: var(--yellow);
+      border: 2px solid var(--deep);
+      padding: 7px;
+    }
+    .field { margin-bottom: 21px; }
+    .field label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 9px; }
+    input[type="text"], select {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-height: 46px;
+      border: 3px solid var(--deep);
+      border-radius: 2px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+      padding: 10px 12px;
+      box-shadow: 3px 3px 0 #dbccd0;
+    }
+    input[type="text"] { direction: ltr; text-align: left; }
+    .panel .hint { color: #695f70; margin: 9px 0 0; }
+    .colors {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+    }
+    .color-chip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 2px solid #d6cbd2; background: #fff; }
+    input[type="color"] { width: 40px; height: 36px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+    .colors small { color: #4b4254; font-size: 12px; font-weight: 700; }
+    .note {
+      padding: 14px;
+      margin-top: 10px;
+      color: #604057;
+      background: #ffe6e5;
+      border-right: 4px solid #d74785;
+      font-size: 12px;
+      line-height: 1.75;
+    }
+    .deck {
+      margin: 22px 10px 2px;
+      padding: 17px 14px 11px;
+      border-top: 5px solid #77718a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      min-height: 90px;
+    }
+    .deck-text { font: 10px/2.1 "Press Start 2P", monospace; color: #f5d2e8; direction: ltr; }
+    .deck-text strong { color: var(--yellow); }
+    .joystick { position: relative; width: 75px; height: 56px; flex: none; }
+    .joystick::before { content: ""; position: absolute; left: 18px; bottom: 0; width: 58px; height: 17px; background: #1c2136; border: 4px solid #0e1426; box-shadow: 3px 3px 0 #8b7d9c; }
+    .joystick::after { content: ""; position: absolute; left: 39px; bottom: 16px; height: 31px; width: 10px; background: var(--yellow); border: 2px solid var(--deep); box-shadow: 0 -12px 0 5px #fc77a9; }
+    .deck-coins { display: flex; gap: 12px; }
+    .deck-coins span { display: block; width: 24px; height: 24px; border-radius: 50%; background: #fe8baa; border: 4px solid #14192c; box-shadow: 3px 3px 0 #181628; }
+    .deck-coins span:nth-child(2) { background: #f7d46f; } .deck-coins span:nth-child(3) { background: #a0e7d3; }
+    .site-footer { max-width: 1400px; margin: 27px auto 17px; padding: 0 22px; color: #4d5361; text-align: center; font-size: 12px; line-height: 1.8; }
+    .site-footer b { font-family: "Press Start 2P", monospace; font-size: 11px; }
+    @media (max-width: 1080px) {
+      .cabinet-layout { grid-template-columns: minmax(0, 1fr) minmax(270px, .78fr); }
+      .marquee::before, .marquee::after { font-size: 14px; letter-spacing: 6px; }
+      .panel { padding: 20px; }
+      .preview { padding: 17px; }
+    }
+    @media (max-width: 850px) {
+      .cabinet-layout { grid-template-columns: minmax(0, 1fr); }
+      .preview { order: 0; }
+      .panel { order: 1; }
+      .marquee { margin: 0 20px; }
+      .artboard { width: min(100%, 510px); }
+      .cabinet { padding: 14px; }
+    }
+    @media (max-width: 500px) {
+      body { background-size: 16px 16px, 16px 16px, auto; }
+      .site-header { padding: 14px 15px 15px; }
+      .mini-brand { gap: 9px; font-size: 12px; }
+      .mini-icon { padding: 8px; font-size: 15px; }
+      .header-tag { font-size: 8px; }
+      .arcade { width: calc(100% - 16px); }
+      .marquee { margin: 0 12px; border-width: 5px; padding: 15px 8px 19px; border-radius: 10px 10px 0 0; box-shadow: inset 0 0 0 3px #ffa7be, inset 0 0 0 7px #ffeeb6; }
+      .marquee .eyebrow { font-size: 8px; }
+      .marquee::before, .marquee::after { content: "✦"; font-size: 16px; top: 40px; }
+      .marquee::before { right: 7%; } .marquee::after { left: 7%; }
+      h1 { font-size: clamp(39px, 12vw, 56px); letter-spacing: -5px; text-shadow: 4px 4px 0 #fff9ea, 6px 6px 0 #e86f9f; }
+      .marquee p { font-size: 11px; }
+      .cabinet { border-width: 6px; padding: 8px; box-shadow: inset 0 0 0 3px #655b79, 0 7px 0 #14192c; }
+      .cabinet-topline { padding: 6px 5px 10px; }
+      .cabinet-topline .pixel-label { font-size: 7px; }
+      .preview { padding: 10px; border-width: 3px; box-shadow: inset 0 0 0 2px #405473; }
+      .preview-heading, .panel-heading { gap: 8px; margin-bottom: 13px; }
+      .preview-heading h2, .panel-heading h2 { font-size: 17px; }
+      .preview .pixel-label { font-size: 7px; }
+      .screen { padding: 8px; border-width: 4px; box-shadow: inset 0 0 0 3px #367e80, 3px 3px 0 #0b1827; }
+      .screen-head { font-size: 7px; }
+      .artboard { padding: 5px; border-width: 3px; box-shadow: 3px 3px 0 #347975; }
+      .screen-foot { font-size: 7px; margin-top: 12px; }
+      .workspace-label { margin: 20px 0 12px; }
+      .actions { gap: 9px; }
+      .primary-actions > button, .export-actions > button { flex: 1 1 100%; }
+      button { font-size: 12px; padding: 11px; min-height: 47px; }
+      .panel { padding: 15px; border-width: 3px; }
+      .panel-heading .pixel-label { font-size: 7px; }
+      .deck { padding: 11px 0 0; margin: 14px 2px 0; min-height: 62px; }
+      .deck-text { font-size: 7px; }
+      .joystick { transform: scale(.75); transform-origin: left center; width: 55px; }
+      .deck-coins { gap: 5px; }
+      .deck-coins span { width: 17px; height: 17px; border-width: 3px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="mini-brand"><span class="mini-icon" aria-hidden="true">✳</span><span>THE PIXEL ART ARCADE</span></div>
+    <span class="header-tag">EST. 2026 · INSERT CREATIVITY</span>
+  </header>
+
+  <main class="arcade" aria-label="qArt — מכונת ארקייד לעיצוב קוד QR">
+    <div class="marquee">
+      <div class="eyebrow">WELCOME TO THE QR ART MACHINE</div>
+      <h1 aria-label="qArt"><span class="accent">q</span>Art</h1>
+      <p>קיו־ארט: כשהקוד הופך לאמנות ✦</p>
+    </div>
+
+    <div class="cabinet">
+      <div class="cabinet-topline" aria-hidden="true">
+        <span class="pixel-label">PLAYER 01 / CREATE MODE</span>
+        <div class="lights"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="cabinet-layout">
+        <section class="preview" aria-labelledby="preview-title">
+          <div class="preview-heading">
+            <h2 id="preview-title">מסך היצירה</h2>
+            <span class="pixel-label">LEVEL 01</span>
+          </div>
+
+          <div class="screen">
+            <div class="screen-head"><span class="on-air">LIVE CANVAS</span><span>QR / ART</span></div>
+            <div class="artboard"><div id="qr" aria-label="תצוגה מקדימה של קוד QR"></div></div>
+            <div class="screen-foot">MAKE SOMETHING SCANNABLE ✳</div>
+          </div>
+
+          <h3 class="workspace-label">✦ כלי המשחק</h3>
+          <div class="actions primary-actions">
+            <button id="regions">מציאת שטחים גדולים למחיקה</button>
+            <button class="secondary" id="editable">סימון ריבועים לשינוי</button>
+            <button class="secondary" id="reset">איפוס הציור ↺</button>
+          </div>
+          <p class="hint">לחצי על ריבוע ב־QR כדי להפוך אותו ולצייר. אפשר גם עם Tab ו־Enter. ריבועי המבנה נעולים; כל שינוי נבדק מחדש כדי לוודא שהקוד עדיין נסרק.</p>
+          <div id="regionResults" class="actions region-options" aria-label="שטחים שנמצאו"></div>
+          <p class="hint">השטחים שמוצגים הם חלופות שנבדקו בנפרד. אחרי מחיקה אפשר לחפש שוב. החיפוש מוגבל ולא מבטיח את השטח הגדול ביותר האפשרי.</p>
+          <p class="status" id="status" role="status" aria-live="polite">מכינים את הקוד…</p>
+
+          <h3 class="workspace-label">✦ שומרים את היצירה</h3>
+          <div class="actions export-actions">
+            <button id="png">הורדת PNG ↓</button>
+            <button class="secondary" id="svg">הורדת SVG ↓</button>
+            <button class="secondary" id="scan">בדיקת סריקה ✓</button>
+          </div>
+          <p class="hint">בדיקת הסריקה מפענחת את העיצוב כאן בדפדפן. מומלץ לבדוק גם בטלפון ובגודל ההדפסה האמיתי.</p>
+        </section>
+
+        <section class="panel" aria-labelledby="panel-title">
+          <div class="panel-heading"><h2 id="panel-title">לוח הבקרה</h2><span class="pixel-label">CONTROLS</span></div>
+          <div class="field">
+            <label for="data">לאן הקוד מוביל?</label>
+            <input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false">
+            <p class="hint">קישורים קצרים יוצרים בדרך כלל קוד פשוט יותר.</p>
+          </div>
+          <div class="field">
+            <label for="mask">בחרי דוגמה</label>
+            <select id="mask">
+              <option value="0">דוגמה 1</option><option value="1">דוגמה 2</option>
+              <option value="2">דוגמה 3</option><option value="3">דוגמה 4</option>
+              <option value="4">דוגמה 5</option><option value="5">דוגמה 6</option>
+              <option value="6">דוגמה 7</option><option value="7">דוגמה 8</option>
+            </select>
+            <p class="hint">כל הדוגמאות מקודדות אותו תוכן. החלפה מאפסת את הציור.</p>
+          </div>
+          <div class="field">
+            <label for="dots">צורת הפיקסלים</label>
+            <select id="dots">
+              <option value="square">ריבועים קלאסיים</option>
+              <option value="rounded">ריבועים מעוגלים</option>
+              <option value="dots">עיגולים</option>
+              <option value="classy">יהלומים עדינים</option>
+              <option value="extra-rounded">מעוגל במיוחד</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="corners">צורת הפינות</label>
+            <select id="corners">
+              <option value="square">מרובעות</option>
+              <option value="extra-rounded">מעוגלות</option>
+              <option value="dot">עיגולים</option>
+              <option value="star">כוכבים ✦</option>
+            </select>
+            <p class="hint">במצב כוכבים המסגרת המרובעת נשארת כדי לעזור לסריקה.</p>
+          </div>
+          <div class="field">
+            <label>צבעי הקוד</label>
+            <div class="colors">
+              <div class="color-chip"><input id="foreground" type="color" value="#241a27" aria-label="צבע הקוד"><small>פיקסלים</small></div>
+              <div class="color-chip"><input id="background" type="color" value="#ffffff" aria-label="צבע הרקע"><small>רקע</small></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="level">תיקון שגיאות</label>
+            <select id="level">
+              <option value="H">H — גבוהה</option><option value="Q">Q — בינונית-גבוהה</option>
+              <option value="M">M — בינונית</option><option value="L">L — נמוכה</option>
+            </select>
+          </div>
+          <div class="note">טיפ מהארקייד: גם קוד תקני עלול להפסיק להיסרק אחרי שינויי צבע וצורה. כדאי לבדוק בכמה מכשירים, במיוחד לפני הדפסה.</div>
+        </section>
+      </div>
+
+      <div class="deck" aria-hidden="true">
+        <div class="joystick"></div>
+        <div class="deck-text"><strong>qArt</strong> · GAME ON<br>CREATE / PLAY / REPEAT</div>
+        <div class="deck-coins"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer"><b>qArt</b> · אמנות שאפשר לסרוק · הקישורים והציורים נשארים בדפדפן שלך</footer>
+  <script src="qr-engine.js"></script>
+  <script src="regions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
