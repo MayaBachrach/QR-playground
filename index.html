@@ -164,6 +164,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-v
 .footer-mark{white-space:nowrap;color:var(--amber);font-weight:900;direction:ltr}
 .mobile-tabs{display:none}
 .desktop-only{display:initial}
+.export-panel .save-art,.export-panel .save-help{display:none}
 @media (max-height:710px) and (min-width:901px){
   .terminal{gap:7px;padding:8px}
   .topbar{min-height:50px;padding:5px 10px}
@@ -220,7 +221,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-v
   .field-help{font-size:12px}
   .export-panel .export-actions{grid-template-columns:1fr;gap:12px}
   .export-panel .pixel-button{font-size:15px;min-height:55px}
-  .save-help{font-size:14px;line-height:1.65;color:var(--soft);border:2px dashed #2c7b4d;padding:14px}
+  .export-panel .save-art{display:grid}
+  .export-panel .save-help{display:block;font-size:14px;line-height:1.65;color:var(--soft);border:2px dashed #2c7b4d;padding:14px}
   .save-art{display:grid;place-items:center;min-height:100px;background:#0c291a;border:2px solid var(--green);font-size:52px;color:var(--amber);text-shadow:5px 5px #000}
   .mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:49px}
   .mobile-tabs button{
@@ -247,6 +249,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-v
   .control-panel .form-grid{gap:7px}
   .field label{font-size:11px;margin-bottom:3px}
   .field-help{font-size:10px;margin-top:3px}
+  .export-panel .save-art{display:none}
+  .export-panel .save-help{font-size:12px;line-height:1.45;padding:9px}
 }
 @media (max-width:900px) and (orientation:landscape) and (max-height:520px){
   .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 108px;gap:6px}
