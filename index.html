@@ -2,421 +2,245 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#06140e">
-<meta name="description" content="qArt — a retro QR art game. Make a QR code that is your own.">
-<title>qArt — INSERT CREATIVITY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06120a">
+<meta name="description" content="qArt — Experimental matrix encoder, 1955.">
+<title>qArt | COMPUTING LABORATORY, 1955</title>
 <style>
-:root {
-  color-scheme:dark;
-  --bg:#06140e;--dark:#071b12;--shade:#102b1d;--grid:#1b4730;
-  --green:#5eff96;--soft:#bdf9c5;--cyan:#7be9e2;--amber:#f8d66f;
-  --red:#ff807b;--white:#e9ffe3;--edge:#34694e;
-  --mono:"Courier New",Courier,monospace;--ui:Tahoma,Verdana,Arial,sans-serif;
+:root{
+ color-scheme:dark;
+ --black:#06120a;--shadow:#0d2111;--olive:#2a4327;--mid:#416a3b;
+ --phosphor:#83e892;--ivory:#e5f3cd;--amber:#d3b568;
+ font-family:'Courier New',Courier,monospace;color:var(--phosphor);
 }
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden}
-body{
-  background:var(--bg);
-  font-family:var(--mono);color:var(--green);
-  background-image:
-    radial-gradient(ellipse at 45% 60%,#17452e 0%,#081a12 58%,#020b08 100%),
-    repeating-linear-gradient(0deg,transparent 0 5px,#0d291b 5px 6px);
-}
+html,body{height:100%;width:100%;margin:0;overflow:hidden}
+body{background:var(--black);font-family:'Courier New',Courier,monospace}
 button,input,select{font:inherit}
 button{cursor:pointer}
-button:disabled,input:disabled,select:disabled{opacity:.54;cursor:wait}
-button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{
-  outline:3px dashed var(--amber);outline-offset:3px
-}
+button:disabled,input:disabled,select:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{outline:3px dashed var(--amber);outline-offset:2px}
 .terminal{
-  position:relative;isolation:isolate;
-  width:100%;height:100dvh;min-height:0;
-  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
-  gap:10px;padding:clamp(10px,1.3vw,22px);
-  background:
-    linear-gradient(90deg,transparent 23px,#0c3521 24px,transparent 25px),
-    linear-gradient(transparent 23px,#0c3521 24px,transparent 25px);
-  background-size:24px 24px;
-}
-.terminal::after{
-  content:"";position:absolute;inset:0;z-index:9;pointer-events:none;
-  background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,#0002 4px);
-  opacity:.48;
+ height:100dvh;width:100%;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+ gap:9px;padding:clamp(9px,1.2vw,19px);
+ background-color:var(--black);
+ background-image:linear-gradient(90deg,#102718 1px,transparent 1px),linear-gradient(#102718 1px,transparent 1px);
+ background-size:16px 16px;
 }
 .topbar{
-  min-height:68px;border:3px solid var(--green);position:relative;
-  background:#062317;box-shadow:inset 0 0 0 3px #1e5537,4px 4px 0 #010b06;
-  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-  align-items:center;gap:14px;padding:8px 17px;
+ display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr);
+ gap:14px;align-items:center;min-height:70px;padding:8px 16px;
+ border:3px double var(--mid);background:var(--shadow);
 }
-.hud-brand{display:flex;gap:15px;align-items:center;min-width:0;direction:ltr;justify-content:flex-start}
-.hud-brand h1{
-  font-family:var(--mono);font-size:clamp(32px,3.8vw,58px);font-weight:900;
-  line-height:1;margin:0;letter-spacing:-5px;color:var(--green);
-  text-shadow:3px 3px 0 #064327,6px 6px 0 #000;
-}
-.hud-brand h1 em{color:var(--amber);font-style:normal}
-.hud-brand .sub{color:var(--cyan);font-size:10px;line-height:1.5;font-weight:700}
-.top-center{text-align:center;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--soft)}
-.top-center small{display:block;font-size:10px;color:var(--green);padding-top:4px}
-.hud-right{display:flex;justify-content:flex-end;align-items:center;gap:15px;font-size:12px;font-weight:700;direction:ltr}
-.hud-dots{display:flex;gap:4px}.hud-dots b{width:10px;height:10px;background:var(--green);box-shadow:2px 2px #000}
-.hud-dots b:nth-child(2){background:var(--amber)}.hud-dots b:nth-child(3){background:var(--red)}
-.display{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,370px);gap:12px}
+.hud-brand{display:flex;align-items:center;gap:15px;direction:ltr;min-width:0}
+.hud-brand h1{margin:0;color:var(--ivory);font-size:clamp(34px,3.4vw,60px);font-weight:bold;line-height:1;letter-spacing:-4px}
+.hud-brand h1 em{font-style:normal;color:var(--phosphor)}
+.hud-brand .sub{color:var(--amber);font-size:11px;font-weight:bold;line-height:1.3;letter-spacing:1px}
+.top-center{text-align:center;color:var(--ivory);font-size:11px;line-height:1.7;font-weight:bold;letter-spacing:1px}
+.top-center small{display:block;color:var(--phosphor);font-size:11px}
+.hud-right{display:flex;align-items:center;justify-content:flex-end;gap:12px;direction:ltr;font-size:11px;white-space:nowrap;color:var(--amber);font-weight:bold}
+.hud-dots{display:flex;gap:6px}.hud-dots b{display:block;width:12px;height:12px;background:var(--phosphor);border:2px solid var(--olive)}
+.hud-dots b:nth-child(2){background:var(--amber)}.hud-dots b:nth-child(3){background:var(--ivory)}
+.display{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,350px);gap:9px}
 .game-screen,.control-panel,.export-panel{
-  border:3px solid var(--green);min-width:0;min-height:0;position:relative;
-  background:rgba(3,18,12,.95);
-  box-shadow:inset 0 0 0 3px #143925,4px 4px 0 #010b06;
+ min-height:0;min-width:0;border:2px solid var(--mid);background:var(--shadow);position:relative;
 }
-.game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:9px;padding:12px}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:28px;
-  border-bottom:2px dashed #397958;padding:0 2px 6px;
-  font-size:12px;line-height:1.2;letter-spacing:.5px;font-weight:900;direction:ltr;
-}
+.game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:7px;padding:11px}
+.section-head{min-height:26px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:2px 0 6px;border-bottom:2px solid var(--mid);direction:ltr;
+ font-size:12px;line-height:1.2;letter-spacing:.7px;font-weight:bold;color:var(--ivory)}
 .section-head .state{color:var(--amber)}
 .playfield{
-  min-height:0;min-width:0;display:flex;justify-content:center;align-items:center;
-  position:relative;overflow:hidden;
-  background:
-    linear-gradient(#0f3523 1px,transparent 1px),
-    linear-gradient(90deg,#0f3523 1px,transparent 1px),
-    radial-gradient(ellipse at center,#123b27,#04160d 77%);
-  background-size:18px 18px,18px 18px,auto;border:2px solid #26623d;
+ position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;
+ border:2px solid var(--olive);background:var(--black);
+ background-image:linear-gradient(90deg,#102718 1px,transparent 1px),linear-gradient(#102718 1px,transparent 1px);
+ background-size:12px 12px;
 }
-.playfield::before,.playfield::after{
-  content:"";width:23px;height:23px;position:absolute;z-index:2;pointer-events:none;
-  border:4px solid var(--amber)
-}
-.playfield::before{top:8px;right:8px;border-bottom:0;border-left:0}
-.playfield::after{bottom:8px;left:8px;border-top:0;border-right:0}
+.playfield:before,.playfield:after{content:'';position:absolute;z-index:2;width:18px;height:18px;border:3px solid var(--amber);pointer-events:none}
+.playfield:before{top:8px;right:8px;border-left:0;border-bottom:0}
+.playfield:after{bottom:8px;left:8px;border-right:0;border-top:0}
 .qr-rack{
-  flex:none;max-width:calc(100% - 32px);max-height:calc(100% - 20px);
-  height:min(100%,calc(100vw - 490px));aspect-ratio:1;
-  border:5px solid #1e723f;padding:8px;background:#e7ffdf;
-  box-shadow:0 0 0 4px #04150a,8px 8px 0 #010d06;
+ flex:none;height:min(100%,calc(100vw - 470px));max-height:calc(100% - 18px);max-width:calc(100% - 22px);
+ aspect-ratio:1;background:#e5f3cd;border:5px solid var(--mid);padding:8px;outline:2px solid var(--black);
 }
-#qr{width:100%;height:100%;display:grid;place-items:center;touch-action:manipulation}
-#qr svg,#qr canvas{width:100%;height:100%;max-width:100%;max-height:100%;display:block}
+#qr{display:grid;place-items:center;height:100%;width:100%;touch-action:manipulation}
+#qr svg,#qr canvas{display:block;height:100%;width:100%;max-width:100%;max-height:100%}
 #qr [data-cell]{cursor:crosshair}
 #qr [data-cell]:focus{outline:none;stroke:#e6007e;stroke-width:.15}
-.stage-tip{
-  display:flex;gap:10px;align-items:center;justify-content:space-between;
-  color:var(--soft);font-size:11px;line-height:1.3;font-weight:700;direction:ltr;
-}
+.stage-tip{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--phosphor);
+ font-size:11px;font-weight:bold;direction:ltr;min-height:16px}
 .stage-tip span:last-child{color:var(--amber)}
 .tools-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.pixel-button{
-  border:2px solid #0a100b;border-radius:0;
-  min-height:46px;padding:6px 9px;background:#c4c4c4;color:#101510;
-  box-shadow:inset 2px 2px #fff,inset -2px -2px #666,3px 3px #020b06;
-  font-family:var(--ui);font-weight:800;font-size:12px;line-height:1.3;
-  text-shadow:none;white-space:normal;
+.pixel-button,.region-results button{
+ min-height:46px;padding:7px 6px;background:var(--olive);color:var(--ivory);
+ border:2px solid var(--mid);border-radius:0;box-shadow:none;white-space:normal;
+ font-family:inherit;font-size:12px;font-weight:bold;line-height:1.3;
 }
-.pixel-button:hover:not(:disabled){background:#fff1ad}
-.pixel-button:active:not(:disabled){box-shadow:inset -2px -2px #fff,inset 2px 2px #555;transform:translate(2px,2px)}
-.pixel-button.primary{background:var(--amber)}.pixel-button.primary:hover:not(:disabled){background:#ffeaaa}
-.pixel-button.green{background:#81e79b}
-.region-results{display:flex;flex-wrap:wrap;gap:7px;align-items:center;min-height:0;max-height:100px;overflow:hidden}
+.pixel-button.primary{background:var(--ivory);color:var(--black)}
+.pixel-button.green{background:var(--phosphor);color:var(--black)}
+.pixel-button:hover:not(:disabled),.region-results button:hover:not(:disabled){background:var(--amber);color:var(--black)}
+.pixel-button:active:not(:disabled){transform:translate(1px,1px)}
+.region-results{display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-height:79px;overflow:hidden;min-height:0}
 .region-results:empty{display:none}
-.region-results button{font-size:11px;min-height:32px;padding:3px 7px;background:#b6e6c1}
-.side{
-  display:grid;grid-template-rows:minmax(0,1fr) auto;gap:12px;min-height:0;min-width:0
-}
-.control-panel{padding:12px;display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px}
-.window-bar{
-  background:#0c703c;border:2px solid #6ed993;
-  padding:7px 9px;min-height:36px;
-  display:flex;align-items:center;justify-content:space-between;gap:9px;
-  font-family:var(--mono);font-size:12px;font-weight:900;color:#e5ffdb;direction:ltr
-}
-.window-controls{display:flex;gap:3px}
-.window-controls i{display:grid;place-items:center;font-style:normal;background:#bdbdbd;color:#101010;
-  border:2px solid #000;box-shadow:inset 1px 1px #fff,inset -1px -1px #727272;
-  height:18px;width:19px;font-size:12px;line-height:1
-}
+.region-results button{min-height:32px;font-size:11px;padding:5px 8px}
+.side{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:9px;min-height:0;min-width:0}
+.control-panel{padding:10px;display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
+.window-bar{min-height:34px;border:2px solid var(--mid);background:var(--olive);color:var(--ivory);
+ display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;
+ font-size:11px;line-height:1.4;font-weight:bold;letter-spacing:.7px;direction:ltr}
+.window-controls{display:flex;align-items:center;gap:4px;direction:ltr}
+.window-controls i{display:block;font-style:normal;background:var(--phosphor);height:10px;width:10px;border:2px solid var(--shadow);font-size:0}
 .form-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
 .field{min-width:0}
 .field.wide{grid-column:1 / -1}
-.field label{display:block;margin:0 0 5px;font-size:11px;font-weight:900;color:var(--soft);line-height:1.2}
-.field select,.field input[type="text"]{
-  width:100%;min-width:0;min-height:40px;padding:7px;
-  background:#c8e9c5;color:#101810;border:2px solid #102419;border-radius:0;
-  box-shadow:inset 2px 2px #729077,inset -2px -2px #eaffdf;
-  font:700 13px/1.1 var(--ui);
+.field label{display:block;margin:0 0 5px;font-size:12px;line-height:1.25;font-weight:bold;color:var(--amber)}
+.field select,.field input[type='text']{
+ width:100%;min-height:41px;min-width:0;padding:7px;background:var(--ivory);color:var(--black);
+ border:2px solid var(--mid);border-radius:0;box-shadow:none;font-size:13px;font-family:inherit;font-weight:bold;
 }
-.field input[type="text"]{font:700 14px var(--mono);direction:ltr;text-align:left}
-.color-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.color-option{min-width:0;display:flex;align-items:center;gap:8px;background:#193b29;padding:5px}
-.color-option input{flex:none;width:36px;height:34px;border:2px solid #57c983;background:#eee;padding:1px;cursor:pointer}
-.color-option span{font-size:11px;color:var(--soft);font-weight:800}
-.field-help{margin-top:6px;color:#a2dbb5;font-size:11px;line-height:1.35}
-.export-panel{padding:11px;display:grid;grid-template-rows:auto auto;gap:10px}
+.field input[type='text']{direction:ltr;text-align:left;font-size:14px}
+.color-options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.color-option{display:flex;align-items:center;gap:8px;min-height:39px;padding:4px 6px;border:2px solid var(--olive)}
+.color-option input{height:29px;width:34px;padding:0;border:2px solid var(--mid);background:var(--ivory);cursor:pointer}
+.color-option span{font-size:12px;font-weight:bold;color:var(--ivory)}
+.field-help{color:var(--phosphor);font-size:11px;line-height:1.4;margin-top:4px}
+.export-panel{display:grid;grid-template-rows:auto auto;gap:8px;padding:10px}
 .export-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.console-footer{
-  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
-  min-height:36px;padding:6px 11px;border:2px solid #276e47;
-  background:#06140e;color:var(--soft);font-size:11px;line-height:1.4;
-}
-.status{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
-.status::before{content:"■ ";color:var(--green)}
-.footer-mark{white-space:nowrap;color:var(--amber);font-weight:900;direction:ltr}
-.mobile-tabs{display:none}
-.desktop-only{display:initial}
 .export-panel .save-art,.export-panel .save-help{display:none}
-@media (max-height:710px) and (min-width:901px){
-  .terminal{gap:7px;padding:8px}
-  .topbar{min-height:50px;padding:5px 10px}
-  .hud-brand h1{font-size:36px}
-  .game-screen,.control-panel{padding:7px;gap:6px}
-  .field select,.field input[type="text"]{min-height:32px;padding:4px}
-  .form-grid{gap:7px}
-  .field label{margin-bottom:3px}
-  .qr-rack{height:min(100%,calc(100dvh - 235px))}
-  .pixel-button{min-height:38px}
-  .export-panel{padding:7px}
+.console-footer{min-height:37px;border:2px solid var(--mid);background:var(--shadow);padding:7px 11px;
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;color:var(--ivory);font-size:11px;line-height:1.5}
+.status{direction:rtl;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status::before{content:'● ';color:var(--phosphor)}
+.footer-mark{color:var(--amber);font-size:11px;font-weight:bold;direction:ltr;white-space:nowrap}
+.mobile-tabs{display:none}
+@media(min-width:901px) and (max-height:710px){
+ .terminal{padding:7px;gap:6px}.topbar{min-height:51px;padding:4px 9px}.hud-brand h1{font-size:35px}
+ .game-screen,.control-panel,.export-panel{padding:7px;gap:5px}
+ .field label{font-size:11px;margin-bottom:3px}.field select,.field input[type='text']{min-height:32px;padding:4px}
+ .form-grid{gap:6px}.pixel-button{min-height:38px}.qr-rack{height:min(100%,calc(100dvh - 240px))}
 }
-@media (max-width:900px){
-  .terminal{
-    padding:8px 9px max(8px,env(safe-area-inset-bottom));
-    gap:7px;grid-template-rows:auto minmax(0,1fr) auto auto;
-  }
-  .topbar{
-    grid-template-columns:1fr auto;min-height:51px;padding:5px 9px;
-    border-width:2px;box-shadow:inset 0 0 0 2px #205a39
-  }
-  .hud-brand h1{font-size:37px;letter-spacing:-4px}
-  .hud-brand .sub{font-size:9px}
-  .top-center{display:none}
-  .hud-right{font-size:10px;gap:9px}
-  .hud-dots b{width:8px;height:8px}
-  .display{display:block;position:relative;min-height:0}
-  .game-screen,.control-panel,.export-panel{
-    height:100%;width:100%;padding:9px;border-width:2px;box-shadow:inset 0 0 0 2px #183e28
-  }
-  .game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:7px}
-  .section-head{min-height:23px;font-size:11px;padding-bottom:5px}
-  .playfield{min-height:0}
-  .qr-rack{
-    height:min(100%,calc(100vw - 46px));max-height:calc(100% - 16px);
-    max-width:calc(100% - 18px);
-    border-width:4px;padding:5px;box-shadow:0 0 0 3px #04150a,4px 4px #010d06
-  }
-  .stage-tip{font-size:10px;gap:4px}
-  .tools-row{gap:5px}
-  .pixel-button{min-height:46px;padding:6px 3px;font-size:11px}
-  .region-results{max-height:70px;gap:5px}
-  .region-results button{min-height:34px}
-  .side{display:contents}
-  .control-panel,.export-panel{display:none}
-  html[data-view="style"] .game-screen,html[data-view="save"] .game-screen{display:none}
-  html[data-view="style"] .control-panel{display:grid;grid-template-rows:auto 1fr;gap:10px}
-  html[data-view="save"] .export-panel{display:flex;flex-direction:column;justify-content:flex-start;gap:15px}
-  .control-panel .form-grid{grid-template-columns:1fr 1fr;gap:11px;align-content:start}
-  .field label{font-size:12px;margin-bottom:6px}
-  .field select,.field input[type="text"]{min-height:45px;font-size:15px}
-  .color-option{min-height:47px}
-  .color-option span{font-size:12px}
-  .field-help{font-size:12px}
-  .export-panel .export-actions{grid-template-columns:1fr;gap:12px}
-  .export-panel .pixel-button{font-size:15px;min-height:55px}
-  .export-panel .save-art{display:grid}
-  .export-panel .save-help{display:block;font-size:14px;line-height:1.65;color:var(--soft);border:2px dashed #2c7b4d;padding:14px}
-  .save-art{display:grid;place-items:center;min-height:100px;background:#0c291a;border:2px solid var(--green);font-size:52px;color:var(--amber);text-shadow:5px 5px #000}
-  .mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:49px}
-  .mobile-tabs button{
-    border:2px solid #255a39;min-height:49px;background:#102c1c;color:#93d5a9;
-    font:900 12px var(--mono);padding:5px;
-  }
-  .mobile-tabs button[aria-selected="true"]{background:#51eb86;color:#061b0d;border-color:#91ffb2;box-shadow:inset 0 -5px #2a9250}
-  .console-footer{min-height:42px;display:block;padding:8px;font-size:11px}
-  .footer-mark{display:none}
-  .status{white-space:normal;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-  .desktop-only{display:none}
+@media(max-width:900px){
+ .terminal{padding:8px 9px max(8px,env(safe-area-inset-bottom));gap:7px;grid-template-rows:auto minmax(0,1fr) auto auto}
+ .topbar{min-height:53px;grid-template-columns:1fr auto;padding:5px 9px;border-width:2px;gap:6px}
+ .hud-brand{gap:10px}.hud-brand h1{font-size:39px;letter-spacing:-4px}.hud-brand .sub{font-size:10px}
+ .top-center{display:none}.hud-right{font-size:10px;gap:6px}.hud-dots b{width:9px;height:9px}
+ .display{display:block;position:relative;min-height:0}
+ .game-screen,.control-panel,.export-panel{height:100%;width:100%;padding:9px;border-width:2px}
+ .game-screen{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:6px}
+ .section-head{min-height:23px;font-size:11px;padding-bottom:5px}
+ .qr-rack{height:min(100%,calc(100vw - 48px));max-height:calc(100% - 16px);max-width:calc(100% - 20px);border-width:4px;padding:5px}
+ .stage-tip{font-size:10px;gap:4px}.pixel-button{min-height:48px;padding:6px 4px;font-size:13px}
+ .tools-row{gap:5px}.region-results{max-height:65px;gap:5px}.region-results button{min-height:34px}
+ .side{display:contents}.control-panel,.export-panel{display:none}
+ html[data-view='style'] .game-screen,html[data-view='save'] .game-screen{display:none}
+ html[data-view='style'] .control-panel{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
+ html[data-view='save'] .export-panel{display:flex;flex-direction:column;justify-content:flex-start;gap:13px}
+ .control-panel .form-grid{grid-template-columns:1fr 1fr;gap:11px;align-content:start}
+ .field label{font-size:13px;margin-bottom:6px}.field select,.field input[type='text']{min-height:46px;font-size:15px}
+ .color-option{min-height:47px}.color-option span{font-size:13px}.field-help{font-size:12px}
+ .export-panel .export-actions{grid-template-columns:1fr;gap:12px}
+ .export-panel .pixel-button{font-size:16px;min-height:54px}
+ .export-panel .save-art{display:grid;place-items:center;min-height:90px;background:var(--black);
+  border:2px solid var(--mid);font-size:44px;line-height:1;color:var(--amber)}
+ .export-panel .save-help{display:block;font-size:13px;line-height:1.5;color:var(--ivory);border:2px solid var(--mid);padding:12px}
+ .mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:49px}
+ .mobile-tabs button{min-height:49px;background:var(--olive);color:var(--ivory);border:2px solid var(--mid);
+  font:bold 13px 'Courier New',Courier,monospace;padding:5px}
+ .mobile-tabs button[aria-selected='true']{background:var(--phosphor);color:var(--black);border-color:var(--ivory)}
+ .console-footer{min-height:41px;display:block;padding:7px 9px;font-size:11px}
+ .footer-mark{display:none}.status{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;line-height:1.35}
 }
-@media (max-width:900px) and (max-height:680px){
-  .terminal{padding:5px 7px;gap:5px}
-  .topbar{min-height:42px}
-  .hud-brand h1{font-size:29px}
-  .hud-brand .sub{font-size:8px}
-  .game-screen{padding:6px;gap:5px}
-  .section-head{font-size:10px;min-height:19px}
-  .pixel-button{min-height:43px;font-size:10px}
-  .console-footer{min-height:35px;padding:5px 7px;font-size:10px}
-  .mobile-tabs,.mobile-tabs button{min-height:44px}
-  .field select,.field input[type="text"]{min-height:39px}
-  .control-panel .form-grid{gap:7px}
-  .field label{font-size:11px;margin-bottom:3px}
-  .field-help{font-size:10px;margin-top:3px}
-  .export-panel .save-art{display:none}
-  .export-panel .save-help{font-size:12px;line-height:1.45;padding:9px}
+@media(max-width:900px) and (max-height:680px){
+ .terminal{padding:5px 7px;gap:5px}.topbar{min-height:42px}.hud-brand h1{font-size:30px}.hud-brand .sub{font-size:8px}
+ .game-screen{padding:6px;gap:4px}.section-head{font-size:10px;min-height:20px}
+ .pixel-button{min-height:43px;font-size:12px}.console-footer{min-height:34px;font-size:10px;padding:5px 7px}
+ .mobile-tabs,.mobile-tabs button{min-height:44px}
+ .field select,.field input[type='text']{min-height:39px;font-size:14px}
+ .control-panel .form-grid{gap:7px}.field label{font-size:12px;margin-bottom:4px}
+ .field-help{font-size:11px;line-height:1.3}
+ .export-panel .save-art{display:none}.export-panel .save-help{font-size:12px;padding:9px}
 }
-@media (max-width:900px) and (orientation:landscape) and (max-height:520px){
-  .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 108px;gap:6px}
-  .topbar{grid-column:1/3;min-height:35px}
-  .display{grid-column:1;grid-row:2}
-  .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);min-height:0}
-  .console-footer{grid-column:1/3;grid-row:3;min-height:30px}
-  .game-screen{grid-template-columns:minmax(0,1fr) minmax(210px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
-  .game-screen .section-head{grid-column:1/3}
-  .playfield{grid-column:1;grid-row:2}
-  .stage-tip{display:none}
-  .tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
-  .region-results{position:absolute;bottom:7px;left:7px;right:7px;background:#00170c;max-height:46px}
-  .qr-rack{height:min(100%,calc(100dvh - 95px));max-width:100%}
-  .control-panel .form-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-  .control-panel .field.wide{grid-column:span 3}
-  .control-panel .field:nth-child(2),.control-panel .field:nth-child(3),.control-panel .field:nth-child(4),.control-panel .field:nth-child(5){grid-column:span 1}
-  .control-panel .field:nth-child(6){grid-column:span 2}
-  .control-panel .field-help{display:none}
-  .export-panel .export-actions{grid-template-columns:repeat(3,1fr)}
-  .export-panel .pixel-button{min-height:44px}
-  .save-art{display:none}
-  .save-help{padding:8px;font-size:11px}
-}
-@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-
-/* The native DOM is the interaction plane; lowres.js renders the visible
-   framebuffer at a hard pixel budget and nearest-neighbor scales it up.
-   Keep native layout geometric: no smooth gradients, blur or rounded UI. */
-body{background:#010b05!important}
-.terminal{
- background-color:#04190d!important;
- background-image:
-  linear-gradient(90deg,#0d2d18 1px,transparent 1px),
-  linear-gradient(#0d2d18 1px,transparent 1px)!important;
- background-size:12px 12px!important
-}
-.playfield{
- background-color:#071f13!important;
- background-image:
-  linear-gradient(90deg,#123723 50%,transparent 50%),
-  linear-gradient(#123723 50%,transparent 50%)!important;
- background-size:18px 18px!important
-}
-.game-screen,.control-panel,.export-panel,.topbar{
- border-radius:0!important;
- box-shadow:inset 0 0 0 3px #173b28,4px 4px 0 #000!important
-}
-.pixel-button,.field select,.field input,.mobile-tabs button{
- border-radius:0!important;text-shadow:none!important;filter:none!important
-}
-@media (min-width:901px){
- .field label,.stage-tip,.console-footer{font-size:13px}
- .window-bar,.section-head{font-size:14px}
- .field select,.field input[type="text"]{font-size:14px}
-}
-
-/* Low resolution should not mean miniature touch controls. */
-@media (max-width:900px){
- .pixel-button{font-size:14px!important;min-height:48px}
- .mobile-tabs button{font-size:14px!important}
- .field label{font-size:14px!important}
- .field select,.field input[type="text"]{font-size:16px!important}
- .section-head,.window-bar{font-size:13px!important}
- .console-footer{font-size:12px!important}
-}
-@media (max-width:900px) and (max-height:680px){
- .pixel-button{font-size:12px!important;min-height:43px}
- .field label{font-size:12px!important}
- .section-head{font-size:11px!important}
+@media(max-width:900px) and (orientation:landscape) and (max-height:520px){
+ .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 103px;gap:5px}
+ .topbar{grid-column:1/3;min-height:34px}.display{grid-column:1;grid-row:2}
+ .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);min-height:0}
+ .console-footer{grid-column:1/3;grid-row:3;min-height:29px}
+ .game-screen{grid-template-columns:minmax(0,1fr) minmax(190px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
+ .game-screen .section-head{grid-column:1/3}.playfield{grid-column:1;grid-row:2}
+ .stage-tip{display:none}.tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
+ .region-results{position:absolute;bottom:5px;left:5px;right:5px;max-height:40px;background:var(--black)}
+ .qr-rack{height:min(100%,calc(100dvh - 93px));max-width:100%}
+ .control-panel .form-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ .control-panel .field.wide{grid-column:span 3}
+ .control-panel .field:nth-child(2),.control-panel .field:nth-child(3),.control-panel .field:nth-child(4),.control-panel .field:nth-child(5){grid-column:span 1}
+ .control-panel .field:nth-child(6){grid-column:span 2}.control-panel .field-help{display:none}
+ .export-panel .export-actions{grid-template-columns:repeat(3,1fr)}.export-panel .pixel-button{min-height:44px;font-size:12px}
+ .export-panel .save-art{display:none}.export-panel .save-help{font-size:11px;padding:8px}
 }
 </style>
 </head>
 <body>
 <main class="terminal">
-  <header class="topbar">
-    <div class="hud-brand">
-      <h1 dir="ltr"><em>q</em>Art</h1>
-      <div class="sub">QR + ART<br>VERSION 1.0</div>
-    </div>
-    <div class="top-center" aria-hidden="true">*** INSERT CREATIVITY ***<small>THE QR EDITOR / 8-BIT SYSTEM</small></div>
-    <div class="hud-right"><span>1UP&nbsp;● READY</span><div class="hud-dots" aria-hidden="true"><b></b><b></b><b></b></div></div>
-  </header>
-
-  <div class="display">
-    <section class="game-screen" aria-label="מסך היצירה של qArt">
-      <div class="section-head"><span>01 / PIXEL CANVAS</span><span class="state">EDIT MODE : ON</span></div>
-      <div class="playfield">
-        <div class="qr-rack"><div id="qr" aria-label="קוד QR לעריכה"></div></div>
-      </div>
-      <div class="stage-tip"><span>CLICK PIXELS TO DRAW / SAFE CELLS ONLY</span><span>● SCAN CHECKED</span></div>
-      <div class="tools-row">
-        <button id="regions" class="pixel-button primary" title="מציאת שטחים למחיקה">חיפוש שטחים</button>
-        <button id="editable" class="pixel-button" title="סימון ריבועים שאפשר לשנות">סימון ריבועים</button>
-        <button id="reset" class="pixel-button" title="איפוס ציור ה־QR">איפוס ציור ↺</button>
-      </div>
-      <div id="regionResults" class="region-results" aria-label="שטחים למחיקה שנמצאו"></div>
-    </section>
-
-    <div class="side">
-      <section class="control-panel" aria-labelledby="control-title">
-        <div class="window-bar"><span id="control-title">QART.EXE / SETTINGS</span><span class="window-controls" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span></div>
-        <div class="form-grid">
-          <div class="field wide"><label for="data">01 // קישור או טקסט</label>
-            <input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false" inputmode="url">
-          </div>
-          <div class="field"><label for="mask">02 // דוגמה</label>
-            <select id="mask"><option value="0">דוגמה 1</option><option value="1">דוגמה 2</option><option value="2">דוגמה 3</option><option value="3">דוגמה 4</option><option value="4">דוגמה 5</option><option value="5">דוגמה 6</option><option value="6">דוגמה 7</option><option value="7">דוגמה 8</option></select>
-          </div>
-          <div class="field"><label for="level">03 // תיקון שגיאות</label>
-            <select id="level"><option value="H">H — גבוהה</option><option value="Q">Q — גבוהה-בינונית</option><option value="M">M — בינונית</option><option value="L">L — נמוכה</option></select>
-          </div>
-          <div class="field"><label for="dots">04 // צורת ריבועים</label>
-            <select id="dots"><option value="square">ריבועים</option><option value="rounded">מעוגלים</option><option value="dots">עיגולים</option><option value="classy">יהלומים</option><option value="extra-rounded">מעוגלים מאוד</option></select>
-          </div>
-          <div class="field"><label for="corners">05 // פינות</label>
-            <select id="corners"><option value="square">מרובעות</option><option value="extra-rounded">מעוגלות</option><option value="dot">עיגולים</option><option value="star">כוכבים ★</option></select>
-          </div>
-          <div class="field wide"><label>06 // צבעי הפיקסלים</label>
-            <div class="color-options">
-              <div class="color-option"><input id="foreground" type="color" value="#241a27" aria-label="צבע קוד"><span>קוד</span></div>
-              <div class="color-option"><input id="background" type="color" value="#ffffff" aria-label="צבע רקע"><span>רקע</span></div>
-            </div>
-          </div>
-          <div class="field wide"><div class="field-help">שינוי דוגמה או רמת תיקון שגיאות מאפס את הציור. פינות כוכב שומרות על המסגרת. מומלץ לבדוק סריקה אחרי כל עיצוב.</div></div>
-        </div>
-      </section>
-
-      <section class="export-panel" aria-label="שמירה ובדיקת סריקה">
-        <div class="window-bar"><span>OUTPUT.DAT / SAVE GAME</span><span class="window-controls" aria-hidden="true"><i>✓</i></span></div>
-        <div class="export-actions">
-          <button class="pixel-button green" id="scan">בדיקת סריקה</button>
-          <button class="pixel-button" id="png">הורדת PNG ↓</button>
-          <button class="pixel-button" id="svg">הורדת SVG ↓</button>
-        </div>
-        <div class="save-art" aria-hidden="true">▦ ★ ▦</div>
-        <div class="save-help">ה־QR נבדק בדפדפן עצמו. לפני הדפסה כדאי לבדוק סריקה גם עם מצלמת הטלפון ובגודל ההדפסה המיועד. אין צורך בהעלאת תמונה.</div>
-      </section>
-    </div>
+ <header class="topbar">
+  <div class="hud-brand">
+   <h1 dir="ltr"><em>q</em>Art</h1>
+   <div class="sub">Q.A. / 55<br>EXPERIMENTAL</div>
   </div>
-  <nav class="mobile-tabs" aria-label="מעבר בין מסכים">
-    <button type="button" data-tab="play" aria-selected="true">▶ יצירה</button>
-    <button type="button" data-tab="style" aria-selected="false">▦ עיצוב</button>
-    <button type="button" data-tab="save" aria-selected="false">↓ שמירה</button>
-  </nav>
-  <footer class="console-footer">
-    <div class="status" id="status" role="status" aria-live="polite">READY · מכינים את הקוד…</div>
-    <span class="footer-mark">qArt // GAME ON // NO TRACKING</span>
-  </footer>
+  <div class="top-center">ELECTRONIC COMPUTING LABORATORY<br><small>INSTRUMENT NO. 055 / DATA ENCODING UNIT</small></div>
+  <div class="hud-right"><span>POWER: ON</span><div class="hud-dots" aria-hidden="true"><b></b><b></b><b></b></div></div>
+ </header>
+ <div class="display">
+  <section class="game-screen" aria-label="תצוגת מכונת הקידוד">
+   <div class="section-head"><span>CRT-01 / MATRIX DISPLAY</span><span class="state">BEAM: STABLE</span></div>
+   <div class="playfield"><div class="qr-rack"><div id="qr" aria-label="קוד QR לעריכה"></div></div></div>
+   <div class="stage-tip"><span>ALTER MATRIX ELEMENTS DIRECTLY</span><span>● LOCKED: STRUCTURE</span></div>
+   <div class="tools-row">
+    <button id="regions" class="pixel-button primary" title="חיפוש שטחים שניתן למחוק">חיפוש שטחים</button>
+    <button id="editable" class="pixel-button" title="סימון ריבועים שניתן להפוך">סימון ריבועים</button>
+    <button id="reset" class="pixel-button" title="איפוס הקוד">איפוס</button>
+   </div>
+   <div id="regionResults" class="region-results" aria-label="שטחים שנמצאו"></div>
+  </section>
+  <div class="side">
+   <section class="control-panel" aria-labelledby="control-title">
+    <div class="window-bar"><span id="control-title">INPUT REGISTERS / UNIT 02</span><span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    <div class="form-grid">
+     <div class="field wide"><label for="data">01 — INPUT SIGNAL / ADDRESS</label><input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false" inputmode="url"></div>
+     <div class="field"><label for="mask">02 — MATRIX VARIANT</label><select id="mask"><option value="0">Variant 01</option><option value="1">Variant 02</option><option value="2">Variant 03</option><option value="3">Variant 04</option><option value="4">Variant 05</option><option value="5">Variant 06</option><option value="6">Variant 07</option><option value="7">Variant 08</option></select></div>
+     <div class="field"><label for="level">03 — REDUNDANCY</label><select id="level"><option value="H">H / HIGH</option><option value="Q">Q / MED-HIGH</option><option value="M">M / MEDIUM</option><option value="L">L / LOW</option></select></div>
+     <div class="field"><label for="dots">04 — ELEMENT FORM</label><select id="dots"><option value="square">SQUARE</option><option value="rounded">ROUND</option><option value="dots">DOT</option><option value="classy">OCTAGON</option><option value="extra-rounded">SOFT SQUARE</option></select></div>
+     <div class="field"><label for="corners">05 — LOCATOR FORM</label><select id="corners"><option value="square">SQUARE</option><option value="extra-rounded">ROUND</option><option value="dot">CIRCLE</option><option value="star">STAR</option></select></div>
+     <div class="field wide"><label>06 — PHOSPHOR / PAPER COLORS</label><div class="color-options"><div class="color-option"><input id="foreground" type="color" value="#241a27" aria-label="צבע הקוד"><span>MARKS</span></div><div class="color-option"><input id="background" type="color" value="#ffffff" aria-label="צבע הרקע"><span>PAPER</span></div></div></div>
+     <div class="field wide"><div class="field-help">CHANGING VARIANT OR REDUNDANCY RESETS THE MATRIX. VERIFY READABILITY BEFORE PRINTING.</div></div>
+    </div>
+   </section>
+   <section class="export-panel" aria-label="בדיקות ופלט">
+    <div class="window-bar"><span>OUTPUT REGISTERS / UNIT 03</span><span class="window-controls" aria-hidden="true"><i></i></span></div>
+    <div class="export-actions"><button id="scan" class="pixel-button green">בדיקת סריקה</button><button id="png" class="pixel-button">הורדת PNG</button><button id="svg" class="pixel-button">הורדת SVG</button></div>
+    <div class="save-art" aria-hidden="true">▦ 055 ▦</div>
+    <div class="save-help">הפלט מיוצר לפי נתוני המטריצה המקוריים, לא לפי רזולוציית המסך. יש לבדוק את הקוד גם במצלמת טלפון לפני הדפסה.</div>
+   </section>
+  </div>
+ </div>
+ <nav class="mobile-tabs" aria-label="בחירת יחידת עבודה">
+  <button type="button" data-tab="play" aria-selected="true">01 / מסך</button>
+  <button type="button" data-tab="style" aria-selected="false">02 / בקרה</button>
+  <button type="button" data-tab="save" aria-selected="false">03 / פלט</button>
+ </nav>
+ <footer class="console-footer"><div id="status" class="status" role="status" aria-live="polite">INITIALIZING MATRIX…</div><span class="footer-mark">1955 / QART / EXPERIMENTAL ELECTRONIC DATA UNIT</span></footer>
 </main>
 <script src="qr-engine.js"></script>
 <script src="regions.js"></script>
 <script src="app.js"></script>
 <script>
-(function () {
-  const tabs = document.querySelectorAll('[data-tab]');
-  function showTab(name) {
-    document.documentElement.dataset.view = name;
-    tabs.forEach(function (button) {
-      button.setAttribute('aria-selected', String(button.dataset.tab === name));
-    });
-  }
-  tabs.forEach(function (button) {
-    button.addEventListener('click', function () { showTab(button.dataset.tab); });
-  });
-  showTab('play');
+(function(){
+ const tabs=document.querySelectorAll('[data-tab]');
+ function show(name){
+  document.documentElement.dataset.view=name;
+  tabs.forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===name)));
+ }
+ tabs.forEach(button=>button.addEventListener('click',()=>show(button.dataset.tab)));
+ show('play');
 }());
 </script>
 <script src="lowres.js"></script>
