@@ -280,13 +280,40 @@ button{border-width:2px}
  .export{grid-column:2;grid-row:2;grid-template-columns:1fr}
  .export button{font-size:18px;min-height:36px}
 }
+
+/* On wider monitors keep the coarse framebuffer, but use bigger glyphs. */
+.mobile-tip{display:none}
+@media (min-width:1501px) and (min-height:711px){
+ .section-head{font-size:37px}
+ .section-head .right{font-size:31px}
+ .hud{font-size:32px}
+ .panel-head{font-size:40px}
+ .field label{font-size:34px}
+ .field input,.field select{font-size:32px;min-height:70px}
+ .form-grid{gap:22px}
+ .play-actions button{font-size:29px}
+ .dpad button{font-size:40px}
+ .dpad .pad-edit{font-size:25px}
+ .export button{font-size:29px;min-height:70px}
+ .console-footer{font-size:29px}
+ .foot-label{font-size:25px}
+ .region-results button{font-size:24px}
+}
+@media (max-width:900px){
+ .desktop-tip{display:none}
+ .mobile-tip{display:inline}
+ .hud{font-size:24px}
+}
+@media (max-width:900px) and (max-height:680px){
+ .hud{font-size:20px}
+}
 </style>
 </head>
 <body>
 <main class="terminal">
  <header class="topbar">
   <div class="brand"><h1>qArt</h1></div>
-  <div class="hud">ARROWS + ENTER</div>
+  <div class="hud"><span class="desktop-tip">ARROWS / ENTER</span><span class="mobile-tip">ARROWS</span></div>
  </header>
  <div class="display">
   <section class="game-screen" aria-label="Keyboard-controlled QR editor">
