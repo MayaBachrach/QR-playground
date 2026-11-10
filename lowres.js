@@ -11,7 +11,7 @@
  screen.setAttribute('aria-hidden','true');
  screen.style.cssText='position:fixed;inset:0;width:100vw;height:100dvh;'+
   'z-index:100;pointer-events:none;visibility:hidden;background:#000000;'+
-  'image-rendering:pixelated;filter:contrast(10000%) hue-rotate(-8deg) saturate(85%) brightness(110%);';
+  'image-rendering:pixelated;';
  document.body.append(screen);
  const ctx=screen.getContext('2d',{alpha:false});
  if(!ctx){screen.remove();return}
@@ -48,7 +48,7 @@
 
  function measure(){
   const w=Math.max(1,Math.round(innerWidth)),h=Math.max(1,Math.round(innerHeight));
-  const block=w>1500?3:2;
+  const block=2; // Exactly half-res, including large monitors: labels stay readable.
   return {w,h,block,pw:Math.ceil(w/block),ph:Math.ceil(h/block)};
  }
  function snapshot(w,h){
