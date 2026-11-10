@@ -4,6 +4,19 @@ An experimental, low-resolution QR matrix editor inspired by early computing ins
 
 The interface and generated QR use only **black (`#000000`) and marker green (`#39ff14`)**. The QR has fixed square modules and standard square finders. There are no color, dot-shape, or corner selectors, and no logo uploads.
 
+## Editing without a mouse
+
+On a computer, use the **arrow keys** to move the matrix cursor and **Enter**
+or **Space** to flip the selected QR square. Locked QR structure squares cannot
+be changed. Use **Tab** and **Enter** to reach other controls.
+
+On phones, the large **direction pad** and **EDIT** button work the same way.
+Use the DRAW / SETTINGS tabs to switch panels. QR squares are not individually
+clickable, so editing is possible even on a small screen.
+
+The screen uses a deliberately small two-color framebuffer. Text is enlarged,
+not smoothed. The QR exported as PNG or SVG is clean and contains no cursor.
+
 ## Features
 
 - Generate standard QR symbols for a URL or text and switch among eight mask patterns without changing the content.
