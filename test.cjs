@@ -28,5 +28,20 @@ for(const data of process.env.QR_TEST_STYLES_ONLY?[]:['https://example.com','htt
 nodes.data.value='https://example.com';nodes.level.value='H';nodes.mask.value='0';
 vm.runInContext('rebuild(); cells[Array.from(code.modules.reservedBit).findIndex(x=>!x)]^=1',context);
 assert.equal(decodeSvg(),nodes.data.value);checked++;
+// Keyboard cursor must move, remain bounded and never appear in exported files.
+const source=fs.readFileSync('app.js','utf8');
+assert(!source.includes('data-cell'), 'The QR must not have mouse click targets');
+vm.runInContext('rebuild()',context);
+const start=vm.runInContext('[cursorX,cursorY]',context);
+vm.runInContext('moveCursor(1,0)',context);
+const moved=vm.runInContext('[cursorX,cursorY]',context);
+assert.equal(moved[0],Math.min(start[0]+1,vm.runInContext('code.modules.size-1',context)));
+assert.equal(moved[1],start[1]);
+const plain=serialize(vm.runInContext('makeSvg()',context));
+const marked=serialize(vm.runInContext('makeSvg(true)',context));
+assert(marked.includes('stroke=')&&!plain.includes('stroke='),
+ 'A selected square must be visible in the editor, but not in the QR export');
+checked++;
+
 for(const path of process.argv.slice(2)){const bytes=fs.readFileSync(path);const png=path.endsWith('.svg')?PNG.sync.read(new Resvg(bytes).render().asPng()):PNG.sync.read(bytes);assert.equal(jsQR(new Uint8ClampedArray(png.data),png.width,png.height)?.data,'https://example.com');checked++}
 console.log(`${checked} classic black-on-green QR decoding checks passed.`);
