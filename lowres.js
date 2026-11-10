@@ -48,7 +48,7 @@
 
  function measure(){
   const w=Math.max(1,Math.round(innerWidth)),h=Math.max(1,Math.round(innerHeight));
-  const block=2; // Exactly half-res, including large monitors: labels stay readable.
+  const block=w>1500?3:2; // Genuine coarse framebuffer; larger glyphs provide readability.
   return {w,h,block,pw:Math.ceil(w/block),ph:Math.ceil(h/block)};
  }
  function snapshot(w,h){
