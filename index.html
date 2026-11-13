@@ -1,380 +1,145 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="qArt — a simple two-color matrix editor.">
-<title>qArt — MATRIX EDITOR</title>
+<meta name="description" content="qArt — מסוף לעריכה יצירתית של קודי QR">
+<title>qArt — מסוף QR</title>
 <style>
-:root{--black:#000000;--green:#39ff14;color-scheme:dark;
-  font-family:"Courier New",Courier,monospace;color:var(--green);background:var(--black)}
+:root{--black:#000000;--pink:#FF0088;background:var(--black);color:var(--pink);font-family:Arial,"Noto Sans Hebrew",sans-serif;font-size:18px;font-weight:700}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--black)}
-button,input,select{font:inherit;border-radius:0}
-button{cursor:pointer}
-button:disabled,input:disabled,select:disabled{opacity:.65;cursor:wait}
-button:focus-visible,input:focus-visible,select:focus-visible,[data-tab]:focus-visible{
-  outline:3px solid var(--green);outline-offset:3px}
-.terminal{width:100%;height:100dvh;padding:clamp(10px,1.25vw,20px);display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;gap:12px;overflow:hidden;background:var(--black)}
-.topbar{min-height:70px;display:flex;align-items:center;justify-content:space-between;
-  gap:16px;border:3px solid var(--green);padding:8px 18px}
-.brand{display:flex;gap:20px;align-items:center;min-width:0}
-.brand h1{font-size:clamp(36px,4vw,64px);line-height:1;margin:0;letter-spacing:-4px;font-weight:900}
-.brand .label{font-size:17px;line-height:1.3;font-weight:900}
-.hud{font-size:17px;font-weight:900;white-space:nowrap}
-.display{min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,370px);gap:12px}
-.game-screen,.control-panel{min-width:0;min-height:0;border:3px solid var(--green);background:var(--black)}
-.game-screen{padding:13px;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:11px}
-.section-head{font-size:19px;line-height:1.1;font-weight:900;display:flex;align-items:center;
-  justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:3px solid var(--green)}
-.section-head .right{font-size:15px;white-space:nowrap}
-.playfield{display:flex;align-items:center;justify-content:center;min-height:0;min-width:0;
-  border:3px solid var(--green);overflow:hidden}
-.qr-rack{width:min(calc(100% - 24px),calc(100dvh - 260px),620px);aspect-ratio:1;
-  flex:none;padding:8px;border:4px solid var(--green);background:var(--green)}
-#qr{width:100%;height:100%;display:grid;place-items:center;touch-action:manipulation}
-#qr svg,#qr canvas{height:100%;width:100%;max-width:100%;max-height:100%;display:block;
-  image-rendering:pixelated;shape-rendering:crispEdges}
-#qr [data-cell]{cursor:crosshair}
-#qr [data-cell]:focus{outline:none;stroke:var(--black);stroke-width:.1}
-.tools-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-button{border:3px solid var(--green);background:var(--black);color:var(--green);
-  min-height:56px;padding:8px 9px;font-size:18px;font-weight:900;line-height:1.15}
-button:hover:not(:disabled),button:active:not(:disabled){background:var(--green);color:var(--black)}
-button.primary{background:var(--green);color:var(--black)}
-button.primary:hover:not(:disabled){background:var(--black);color:var(--green)}
-.region-results{display:flex;flex-wrap:wrap;gap:6px;max-height:84px;overflow:hidden}
+html,body{margin:0;min-width:280px;min-height:100%;background:var(--black);color:var(--pink)}
+button,input{font:inherit;border-radius:0;box-shadow:none}
+button{cursor:pointer;background:var(--black);color:var(--pink);border:2px solid var(--pink);min-height:50px;padding:10px 14px;font-weight:800;line-height:1.25}
+button:hover:not(:disabled),button[aria-pressed="true"],button.primary{background:var(--pink);color:var(--black)}
+button.primary:hover:not(:disabled){background:var(--black);color:var(--pink)}
+button:disabled{cursor:wait;border-style:dashed}
+:focus-visible{outline:3px solid var(--pink);outline-offset:4px}
+.terminal{min-height:100dvh;max-width:1600px;margin:auto;padding:clamp(10px,2vw,28px);display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:16px}
+.topbar{border:3px solid var(--pink);display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 20px}
+.brand{display:flex;align-items:baseline;gap:18px;min-width:0}
+.brand h1{font:bold clamp(42px,5vw,72px)/1 "Courier New",monospace;letter-spacing:-3px;margin:0;direction:ltr}
+.brand span{font-size:clamp(19px,2vw,28px)}
+.terminal-id{font:bold clamp(14px,1.4vw,20px)/1.3 "Courier New",monospace;direction:ltr;white-space:nowrap}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.85fr);gap:16px;min-height:0}
+.screen,.controls{border:3px solid var(--pink);padding:clamp(12px,1.5vw,22px);min-width:0}
+.screen{display:flex;flex-direction:column;gap:15px;min-height:530px}
+.screen-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:clamp(17px,1.8vw,24px)}
+.position{font-family:"Courier New",monospace;direction:ltr;font-size:clamp(16px,1.5vw,20px)}
+.qr-well{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--pink);padding:12px}
+#qr{width:min(100%,68dvh,650px);aspect-ratio:1;display:grid;place-items:center;outline-offset:6px}
+#qr svg{width:100%;height:100%;display:block;shape-rendering:crispEdges;image-rendering:pixelated;pointer-events:none}
+.instructions{font-size:clamp(16px,1.5vw,21px);line-height:1.4;text-align:center}
+.controls{display:flex;flex-direction:column;gap:18px}
+.group{display:flex;flex-direction:column;gap:10px}
+.group-title{font-size:clamp(20px,2vw,27px);font-weight:900;border-bottom:2px solid var(--pink);padding-bottom:7px}
+.field-label{display:block;font-size:clamp(18px,1.6vw,22px);margin-bottom:8px}
+#data{width:100%;min-height:58px;padding:9px 12px;background:var(--black);color:var(--pink);border:2px solid var(--pink);direction:ltr;text-align:left;font-family:"Courier New",monospace;font-size:clamp(17px,1.7vw,22px)}
+#data::placeholder{color:var(--pink)}
+.dpad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,49px);gap:5px;max-width:330px;margin:auto;width:100%;direction:ltr}
+.dpad button{min-height:0;padding:3px;font-size:27px}
+.dpad .pad-up{grid-column:2;grid-row:1}
+.dpad .pad-left{grid-column:1;grid-row:2}
+.dpad .pad-edit{grid-column:2;grid-row:2;font-size:16px;line-height:1.05}
+.dpad .pad-right{grid-column:3;grid-row:2}
+.dpad .pad-down{grid-column:2;grid-row:3}
+.region-results{display:grid;grid-template-columns:1fr;gap:7px}
 .region-results:empty{display:none}
-.region-results button{min-height:34px;font-size:14px;padding:5px}
-.panel-head{font-size:19px;font-weight:900;line-height:1.2;padding:8px 10px;
-  background:var(--green);color:var(--black)}
-.control-panel{padding:13px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:16px}
-.form-grid{min-height:0;display:flex;flex-direction:column;gap:19px}
-.field{min-width:0}
-.field label{display:block;font-size:18px;line-height:1.15;font-weight:900;margin-bottom:8px}
-.field input,.field select{width:100%;min-width:0;min-height:52px;background:var(--black);
-  color:var(--green);border:3px solid var(--green);font-size:18px;font-weight:900;
-  padding:8px 11px}
-.field input{direction:ltr;text-align:left}
-.field p{margin:8px 0 0;font-size:14px;font-weight:700;line-height:1.4}
-.export{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;border-top:3px solid var(--green);padding-top:12px}
-.export button{font-size:15px;min-height:54px;padding:7px 4px}
-.console-footer{min-height:50px;border:3px solid var(--green);padding:9px 14px;
-  display:flex;align-items:center;gap:12px;justify-content:space-between;font-size:16px;font-weight:900}
-.status{min-width:0;line-height:1.3;overflow:hidden;display:-webkit-box;
-  -webkit-line-clamp:2;-webkit-box-orient:vertical}
-.foot-label{white-space:nowrap}
-.mobile-tabs{display:none}
-@media(max-width:900px){
- .terminal{padding:8px;gap:8px;grid-template-rows:auto minmax(0,1fr) auto auto}
- .topbar{min-height:59px;padding:8px 12px;border-width:2px}
- .brand h1{font-size:43px}.brand .label{font-size:12px}
- .hud{font-size:14px}
- .display{display:block;position:relative}
- .game-screen,.control-panel{width:100%;height:100%;border-width:2px}
- .game-screen{padding:8px;gap:8px;grid-template-rows:auto minmax(0,1fr) auto auto}
- .section-head{font-size:17px;padding-bottom:5px;border-width:2px}
- .section-head .right{font-size:12px}
- .playfield{border-width:2px}
- .qr-rack{width:min(calc(100% - 14px),calc(100dvh - 235px));padding:5px;border-width:3px}
- .tools-row{gap:5px}
- .tools-row button{font-size:15px;min-height:50px;padding:4px 3px;border-width:2px}
- .region-results{max-height:76px}
- .region-results button{font-size:12px}
- .control-panel{display:none;padding:12px;gap:12px}
- html[data-view="controls"] .game-screen{display:none}
- html[data-view="controls"] .control-panel{display:grid}
- .panel-head{font-size:20px}
- .form-grid{gap:15px}
- .field label{font-size:20px;margin-bottom:7px}
- .field input,.field select{font-size:19px;min-height:54px}
- .field p{font-size:15px}
- .export{gap:6px;padding-top:11px}
- .export button{font-size:15px;min-height:54px}
- .mobile-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
- .mobile-tabs button{min-height:53px;font-size:20px;border-width:2px}
- .mobile-tabs button[aria-selected="true"]{color:var(--black);background:var(--green)}
- .console-footer{min-height:48px;padding:8px 10px;font-size:14px;border-width:2px}
- .foot-label{display:none}
+.region-results button{text-align:right;min-height:47px}
+.erase-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.export{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.output{margin-top:auto}
+.footer{border-top:3px solid var(--pink);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 5px;font-size:clamp(16px,1.5vw,22px)}
+#status{line-height:1.35;overflow-wrap:anywhere}
+.footer-mark{font:bold 17px "Courier New",monospace;white-space:nowrap;direction:ltr}
+@media(max-width:920px){
+ .terminal{display:flex;flex-direction:column;gap:10px;padding:9px}
+ .topbar{padding:10px 12px;border-width:2px}
+ .brand{gap:10px}.brand h1{font-size:44px}.brand span{font-size:18px}
+ .terminal-id{font-size:12px}
+ .workspace{display:flex;flex-direction:column;gap:10px}
+ .screen,.controls{border-width:2px;padding:12px}
+ .screen{min-height:0;gap:10px}
+ .qr-well{padding:7px}
+ #qr{width:min(100%,65dvh,560px)}
+ .controls{gap:17px}
+ .footer{border-width:2px}
+ .footer-mark{display:none}
 }
-@media(max-width:900px) and (max-height:680px){
- .terminal{padding:5px;gap:5px}
- .topbar{min-height:49px;padding:4px 9px}
- .brand h1{font-size:35px}.brand .label{font-size:11px}.hud{font-size:12px}
- .game-screen{gap:5px;padding:5px}
- .section-head{font-size:15px;min-height:21px}
- .tools-row button{min-height:45px;font-size:13px}
- .mobile-tabs button{min-height:46px;font-size:18px}
- .console-footer{min-height:39px;font-size:12px;padding:5px 7px}
- .qr-rack{width:min(calc(100% - 12px),calc(100dvh - 205px))}
- .control-panel{gap:8px;padding:8px}
- .form-grid{gap:10px}
- .field label{font-size:17px;margin-bottom:4px}
- .field input,.field select{min-height:44px;font-size:17px;padding:5px}
- .field p{font-size:13px}
- .export button{font-size:13px;min-height:44px}
+@media(max-width:400px){
+ .terminal-id{display:none}
+ .brand span{font-size:17px}
+ .erase-actions{grid-template-columns:1fr}
+ .dpad{grid-template-rows:repeat(3,46px)}
 }
-@media(max-width:900px) and (orientation:landscape) and (max-height:520px){
- .terminal{grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr) 125px}
- .topbar{grid-row:1;grid-column:1/3;min-height:40px}
- .display{grid-row:2;grid-column:1}
- .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:1fr 1fr}
- .console-footer{grid-column:1/3;grid-row:3;min-height:30px}
- .game-screen{grid-template-columns:minmax(0,1fr) minmax(165px,.8fr);grid-template-rows:auto minmax(0,1fr);gap:5px}
- .game-screen .section-head{grid-row:1;grid-column:1/3}
- .playfield{grid-column:1;grid-row:2}
- .tools-row{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
- .region-results{position:absolute;left:5px;right:5px;bottom:5px;background:var(--black);max-height:45px}
- .qr-rack{width:min(calc(100% - 10px),calc(100dvh - 85px))}
- .control-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto minmax(0,1fr);gap:5px}
- .panel-head{grid-column:1/3;grid-row:1;font-size:16px;padding:3px 8px}
- .form-grid{grid-column:1;grid-row:2;gap:6px}
- .field label{font-size:12px;margin-bottom:2px}
- .field input,.field select{min-height:30px;font-size:13px;padding:2px}
- .field p{display:none}
- .export{grid-column:2;grid-row:2;grid-template-columns:1fr;gap:4px;align-content:center;border:0;padding:0}
- .export button{min-height:35px;font-size:12px}
-}
-
-/* KEYBOARD-FIRST, LOW-RES INTERFACE. Large raster-readable letters,
-   simpler frame, and no mouse-based QR editing. */
-.terminal{padding:9px;gap:8px;grid-template-rows:66px minmax(0,1fr) 48px}
-.topbar{border:0;border-bottom:3px solid var(--green);min-height:0;padding:4px 12px}
-.brand h1{font-size:60px;letter-spacing:-3px}
-.hud{font-size:22px;white-space:nowrap}
-.display{grid-template-columns:minmax(0,1fr) minmax(350px,420px);gap:13px}
-.game-screen,.control-panel{border:0}
-.game-screen{padding:2px;grid-template-rows:37px minmax(0,1fr) 153px auto;gap:7px}
-.section-head{font-size:28px;border:0;padding:0;min-height:0}
-.section-head .right{font-size:22px}
-.playfield{border:0;background:var(--black)}
-.qr-rack{height:min(100%,600px);width:auto;max-width:100%;border:3px solid var(--green);padding:5px}
-#qr{cursor:default}
-#qr svg{pointer-events:none;image-rendering:pixelated}
-#qr [data-cell]{cursor:default}
-.play-controls{display:grid;grid-template-columns:minmax(164px,232px) minmax(130px,190px);
- gap:14px;width:min(100%,490px);height:153px;margin:auto;min-width:0}
-.dpad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
- grid-template-rows:repeat(3,minmax(0,1fr));gap:3px;min-width:0;min-height:0}
-.dpad button{min-height:0;min-width:0;padding:0 2px;font-size:32px;line-height:1;font-weight:900}
-.pad-up{grid-column:2;grid-row:1}
-.pad-left{grid-column:1;grid-row:2}
-.pad-edit{grid-column:2;grid-row:2}
-.dpad .pad-edit{font-size:18px;background:var(--green);color:var(--black)}
-.pad-right{grid-column:3;grid-row:2}
-.pad-down{grid-column:2;grid-row:3}
-.play-actions{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:5px;min-width:0}
-.play-actions button{min-height:0;font-size:22px;padding:3px}
-.region-results{max-height:60px;gap:6px}
-.region-results button{font-size:18px;min-height:42px}
-.control-panel{padding:2px;gap:14px;grid-template-rows:49px minmax(0,1fr) auto}
-.panel-head{font-size:29px;padding:8px 10px}
-.form-grid{gap:15px}
-.field label{font-size:25px;line-height:1.1;margin-bottom:7px}
-.field input,.field select{font-size:22px;min-height:57px;padding:6px 10px;border-width:2px}
-.field p{display:none}
-.export{border:0;padding:0;gap:7px}
-.export button{font-size:22px;min-height:59px;padding:4px}
-button{border-width:2px}
-.console-footer{border:0;border-top:3px solid var(--green);
- font-size:21px;padding:5px 10px;min-height:0}
-.foot-label{font-size:18px}
-@media (min-width:901px) and (max-height:710px){
- .terminal{grid-template-rows:50px minmax(0,1fr) 37px;gap:5px;padding:5px}
- .topbar{padding:2px 9px}
- .brand h1{font-size:43px}
- .hud{font-size:19px}
- .game-screen{grid-template-rows:29px minmax(0,1fr) 125px auto;gap:4px}
- .section-head{font-size:24px}
- .play-controls{height:125px}
- .dpad button{font-size:27px}
- .dpad .pad-edit{font-size:15px}
- .play-actions button{font-size:18px}
- .control-panel{gap:7px;grid-template-rows:40px minmax(0,1fr) auto}
- .panel-head{font-size:25px}
- .form-grid{gap:8px}
- .field label{font-size:20px;margin-bottom:3px}
- .field input,.field select{font-size:20px;min-height:39px;padding:3px 6px}
- .export button{font-size:18px;min-height:43px}
- .console-footer{font-size:17px}
- .foot-label{font-size:15px}
-}
-@media (max-width:900px){
- .terminal{grid-template-rows:55px minmax(0,1fr) 54px 43px;padding:7px;gap:6px}
- .topbar{padding:4px 7px;border-bottom:2px solid var(--green)}
+@media(min-width:921px) and (max-height:720px){
+ .terminal{gap:9px;padding:9px}
+ .topbar{padding:6px 14px}
  .brand h1{font-size:45px}
- .hud{font-size:17px}
- .display{display:block;min-height:0}
- .game-screen,.control-panel{width:100%;height:100%}
- .game-screen{display:grid;grid-template-columns:1fr;grid-template-rows:34px minmax(0,1fr) 155px auto;
-  padding:2px;gap:5px}
- .section-head{font-size:25px}
- .section-head .right{font-size:21px}
- .playfield{min-height:0;min-width:0}
- .qr-rack{height:min(100%,calc(100vw - 27px));max-height:100%;max-width:100%;padding:4px}
- .play-controls{height:155px;grid-template-columns:minmax(159px,1.1fr) minmax(103px,.8fr);
-  width:min(100%,390px);gap:10px}
- .dpad button{font-size:31px;border-width:2px}
- .dpad .pad-edit{font-size:17px}
- .play-actions button{font-size:21px;border-width:2px}
- .region-results{max-height:46px;overflow:hidden}
- .region-results button{min-height:35px;font-size:16px;padding:3px}
- .control-panel{display:none;padding:7px;grid-template-rows:53px minmax(0,1fr) auto;gap:16px}
- html[data-view="controls"] .game-screen{display:none}
- html[data-view="controls"] .control-panel{display:grid}
- .panel-head{font-size:30px}
- .form-grid{gap:18px}
- .field label{font-size:25px;margin-bottom:7px}
- .field input,.field select{font-size:24px;min-height:60px;padding:8px}
- .export button{min-height:60px;font-size:22px}
- .mobile-tabs{display:grid;gap:5px;grid-template-columns:repeat(2,minmax(0,1fr))}
- .mobile-tabs button{min-height:54px;font-size:23px}
- .console-footer{min-height:43px;padding:4px 7px;font-size:18px;border-top:2px solid var(--green)}
- .foot-label{display:none}
-}
-@media (max-width:900px) and (max-height:680px){
- .terminal{grid-template-rows:44px minmax(0,1fr) 46px 35px;padding:4px;gap:4px}
- .brand h1{font-size:37px}
- .hud{font-size:14px}
- .game-screen{grid-template-rows:28px minmax(0,1fr) 131px auto;gap:3px}
- .section-head{font-size:22px}
- .section-head .right{font-size:18px}
- .play-controls{height:131px;gap:7px}
- .dpad button{font-size:26px}
- .dpad .pad-edit{font-size:16px}
- .play-actions button{font-size:18px}
- .mobile-tabs button{min-height:46px;font-size:20px}
- .console-footer{min-height:35px;font-size:15px}
- .control-panel{grid-template-rows:42px minmax(0,1fr) auto;gap:8px;padding:5px}
- .panel-head{font-size:25px;padding:4px}
- .form-grid{gap:10px}
- .field label{font-size:20px;margin-bottom:4px}
- .field input,.field select{font-size:20px;min-height:46px;padding:4px}
- .export button{font-size:18px;min-height:45px}
-}
-@media (max-width:900px) and (orientation:landscape) and (max-height:520px){
- .terminal{grid-template-columns:minmax(0,1fr) 118px;
-  grid-template-rows:38px minmax(0,1fr) 32px;gap:4px}
- .topbar{grid-column:1/3;grid-row:1}
- .display{grid-column:1;grid-row:2}
- .mobile-tabs{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-template-rows:1fr 1fr}
- .console-footer{grid-column:1/3;grid-row:3}
- .game-screen{grid-template-columns:minmax(0,1fr) minmax(225px,.9fr);
-  grid-template-rows:30px minmax(0,1fr);gap:5px}
- .section-head{grid-column:1/3;grid-row:1}
- .playfield{grid-column:1;grid-row:2}
- .qr-rack{height:min(100%,calc(100dvh - 89px));width:auto}
- .play-controls{grid-column:2;grid-row:2;height:100%;width:100%;min-height:0;
-  grid-template-columns:minmax(120px,1fr) minmax(90px,.7fr);gap:5px}
- .dpad button{font-size:25px}
- .dpad .pad-edit{font-size:14px}
- .play-actions button{font-size:17px}
- .region-results{position:absolute;left:5px;right:5px;bottom:5px;max-height:35px;background:var(--black)}
- .control-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto minmax(0,1fr);gap:6px}
- .panel-head{grid-column:1/3;grid-row:1;font-size:22px}
- .form-grid{grid-column:1;grid-row:2;gap:7px}
- .field label{font-size:16px;margin-bottom:2px}
- .field input,.field select{font-size:18px;min-height:36px;padding:2px}
- .export{grid-column:2;grid-row:2;grid-template-columns:1fr}
- .export button{font-size:18px;min-height:36px}
-}
-
-/* On wider monitors keep the coarse framebuffer, but use bigger glyphs. */
-.mobile-tip{display:none}
-@media (min-width:1501px) and (min-height:711px){
- .section-head{font-size:37px}
- .section-head .right{font-size:31px}
- .hud{font-size:32px}
- .panel-head{font-size:40px}
- .field label{font-size:34px}
- .field input,.field select{font-size:32px;min-height:70px}
- .form-grid{gap:22px}
- .play-actions button{font-size:29px}
- .dpad button{font-size:40px}
- .dpad .pad-edit{font-size:25px}
- .export button{font-size:29px;min-height:70px}
- .console-footer{font-size:29px}
- .foot-label{font-size:25px}
- .region-results button{font-size:24px}
-}
-@media (max-width:900px){
- .desktop-tip{display:none}
- .mobile-tip{display:inline}
- .hud{font-size:24px}
-}
-@media (max-width:900px) and (max-height:680px){
- .hud{font-size:20px}
+ .workspace{gap:9px}
+ .screen,.controls{padding:10px}
+ .screen{min-height:0}
+ .controls{gap:10px}
+ .group{gap:6px}
+ .dpad{grid-template-rows:repeat(3,40px)}
+ .footer{padding:7px 3px}
 }
 </style>
 </head>
 <body>
 <main class="terminal">
  <header class="topbar">
-  <div class="brand"><h1>qArt</h1></div>
-  <div class="hud"><span class="desktop-tip">ARROWS / ENTER</span><span class="mobile-tip">ARROWS</span></div>
+  <div class="brand"><h1>qArt</h1><span>מסוף לעריכת QR</span></div>
+  <div class="terminal-id">TERMINAL / 1955</div>
  </header>
- <div class="display">
-  <section class="game-screen" aria-label="Keyboard-controlled QR editor">
-   <div class="section-head"><span>MATRIX</span><span id="position" class="right">X 01 Y 01</span></div>
-   <div class="playfield">
-    <div class="qr-rack"><div id="qr" tabindex="0"
-     aria-label="QR matrix. Use arrow keys to move and Enter or Space to edit."></div></div>
-   </div>
-   <div class="play-controls">
-    <div class="dpad" aria-label="Move selection">
-     <button type="button" id="move-up" class="pad-up" aria-label="Move up">↑</button>
-     <button type="button" id="move-left" class="pad-left" aria-label="Move left">←</button>
-     <button type="button" id="draw" class="pad-edit primary">EDIT</button>
-     <button type="button" id="move-right" class="pad-right" aria-label="Move right">→</button>
-     <button type="button" id="move-down" class="pad-down" aria-label="Move down">↓</button>
-    </div>
-    <div class="play-actions">
-     <button id="regions" type="button">SPACE</button>
-     <button id="editable" type="button">SAFE</button>
-     <button id="reset" type="button">RESET</button>
-    </div>
-   </div>
-   <div id="regionResults" class="region-results" aria-label="Erasable regions"></div>
+ <div class="workspace">
+  <section class="screen" aria-label="קוד QR">
+   <div class="screen-head"><strong>מטריצת עריכה</strong><span id="position" class="position">X: 01 / Y: 01</span></div>
+   <div class="qr-well"><div id="qr" tabindex="0" role="img" aria-label="קוד QR. השתמשו בחצים לתנועה וברווח לסימון או לביטול סימון"></div></div>
+   <div class="instructions">חצים לתנועה · רווח לסימון או לביטול סימון</div>
   </section>
-  <section class="control-panel" aria-label="Controls">
-   <div class="panel-head">SETTINGS</div>
-   <div class="form-grid">
-    <div class="field"><label for="data">LINK</label><input id="data" type="text" value="https://example.com" spellcheck="false" placeholder="https://..."></div>
-    <div class="field"><label for="mask">PATTERN</label>
-     <select id="mask"><option value="0">Pattern 1</option><option value="1">Pattern 2</option><option value="2">Pattern 3</option><option value="3">Pattern 4</option><option value="4">Pattern 5</option><option value="5">Pattern 6</option><option value="6">Pattern 7</option><option value="7">Pattern 8</option></select>
-    </div>
-    <div class="field"><label for="level">ERROR LEVEL</label>
-     <select id="level"><option value="H">High</option><option value="Q">Medium-high</option><option value="M">Medium</option><option value="L">Low</option></select>
-     <p></p>
+  <section class="controls" aria-label="לוח בקרה">
+   <div class="group">
+    <div class="group-title">01 / יצירת קוד</div>
+    <label class="field-label" for="data">קישור או טקסט</label>
+    <input id="data" type="text" value="https://example.com" placeholder="https://..." spellcheck="false" autocomplete="off">
+   </div>
+   <div class="group">
+    <div class="group-title">02 / עריכת משבצות</div>
+    <div class="dpad" role="group" aria-label="שליטה במשבצות">
+     <button id="move-up" class="pad-up" type="button" aria-label="למעלה">↑</button>
+     <button id="move-left" class="pad-left" type="button" aria-label="שמאלה">←</button>
+     <button id="draw" class="pad-edit primary" type="button">סמן / בטל</button>
+     <button id="move-right" class="pad-right" type="button" aria-label="ימינה">→</button>
+     <button id="move-down" class="pad-down" type="button" aria-label="למטה">↓</button>
     </div>
    </div>
-   <div class="export">
-    <button id="scan">CHECK</button>
-    <button id="png">PNG ↓</button>
-    <button id="svg">SVG ↓</button>
+   <div class="group">
+    <div class="group-title">03 / מחיקת שטחים</div>
+    <button id="regions" type="button" class="primary">חפש אזורים למחיקה</button>
+    <div id="regionResults" class="region-results" aria-label="אזורים שאפשר למחוק"></div>
+    <div class="erase-actions">
+     <button id="erase" type="button" disabled>מחק אזור נבחר</button>
+     <button id="reset" type="button">איפוס שינויים</button>
+    </div>
+   </div>
+   <div class="group output">
+    <div class="group-title">04 / שמירת קוד</div>
+    <div class="export">
+     <button id="png" type="button">הורדת PNG</button>
+     <button id="svg" type="button">הורדת SVG</button>
+    </div>
    </div>
   </section>
  </div>
- <nav class="mobile-tabs" aria-label="Screens">
-  <button type="button" data-tab="play" aria-selected="true">DRAW</button>
-  <button type="button" data-tab="controls" aria-selected="false">SETTINGS</button>
- </nav>
- <footer class="console-footer"><div id="status" class="status" role="status" aria-live="polite">READY</div><div class="foot-label">ARROWS: MOVE &nbsp; ENTER: EDIT &nbsp; TAB: MENU</div></footer>
+ <footer class="footer">
+  <div id="status" role="status" aria-live="polite">המסוף מוכן</div>
+  <span class="footer-mark">QR / READY</span>
+ </footer>
 </main>
 <script src="qr-engine.js"></script>
 <script src="regions.js"></script>
 <script src="app.js"></script>
-<script>
-(function(){
- const buttons=document.querySelectorAll('[data-tab]');
- function show(view){document.documentElement.dataset.view=view;
-  buttons.forEach(button=>button.setAttribute('aria-selected',String(button.dataset.tab===view)))}
- buttons.forEach(button=>button.addEventListener('click',()=>show(button.dataset.tab)));
- show('play');
-}());
-</script>
-<script src="lowres.js"></script>
 </body>
 </html>

@@ -1,111 +1,362 @@
-const $=id=>document.getElementById(id);
-let code,cells,safe=new Set(),busy=false;
-let cursorX=0,cursorY=0;
-const ns='http://www.w3.org/2000/svg';
-const status=text=>$('status').textContent=text;
-let selectedRegion=null,regions=[];
-function clearRegions(){selectedRegion=null;regions=[];$('regionResults').replaceChildren()}
-function eraseRegion(original,r){const next=Uint8Array.from(original),n=code.modules.size;for(let y=r.y;y<r.y+r.h;y++)for(let x=r.x;x<r.x+r.w;x++)next[y*n+x]=0;return next}
-function showRegions(){const container=$('regionResults');container.replaceChildren();regions.forEach((r,i)=>{const b=document.createElement('button');b.className='secondary';b.textContent=`SPACE ${i+1}: ${r.w}×${r.h}`;b.setAttribute('aria-pressed',String(selectedRegion===r));b.onclick=()=>{selectedRegion=r;showRegions();paint()};container.append(b)});if(selectedRegion){const erase=document.createElement('button');erase.textContent='ERASE SELECTED';erase.onclick=deleteRegion;container.append(erase)}}
-async function findRegions(){if(busy||!cells)return;lock(true);clearRegions();safe.clear();const original=Uint8Array.from(cells);paint();status('SEARCHING FOR EMPTY SPACE...');try{if(!await verifies()){status('QR NOT READABLE. RESET FIRST.');return}const result=await QRRegions.search({size:code.modules.size,reserved:code.modules.reservedBit,dark:original,verify:async r=>{cells=eraseRegion(original,r);try{return await verifies()}finally{cells=original}},progress:count=>{if(count%8===0)status(`SEARCHING... ${count} TESTS`)}});regions=result.regions;selectedRegion=regions[0]||null;showRegions();paint();status(regions.length?`${regions.length} SPACES FOUND. SELECT TO ERASE.`:'NO SAFE SPACE FOUND. TRY ANOTHER PATTERN.')}catch(e){clearRegions();status('SPACE SEARCH FAILED.')}finally{cells=original;paint();lock(false)}}
-async function deleteRegion(){if(busy||!selectedRegion||!cells)return;lock(true);const original=Uint8Array.from(cells);try{cells=eraseRegion(original,selectedRegion);if(await verifies()){clearRegions();safe.clear();status('SPACE ERASED. QR STILL READABLE.')}else{cells=original;clearRegions();status('ERASE BLOCKED. QR COULD NOT BE READ.')}paint()}catch(e){cells=original;clearRegions();paint();status('ERASE FAILED. QR RESTORED.')}finally{lock(false)}}
-function el(tag,attrs){const node=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>node.setAttribute(k,v));return node}
-function expected(){return $('data').value||' '}
-function lock(value){busy=value;document.querySelectorAll('input,select,button').forEach(node=>node.disabled=value)}
-function rebuild(){clearRegions();safe.clear();try{code=QREngine.create(expected(),{errorCorrectionLevel:$('level').value,maskPattern:Number($('mask').value)});cells=Uint8Array.from(code.modules.data);resetCursor();paint();status('READY. SELECT A PIXEL TO EDIT.')}catch(e){cells=null;$('qr').replaceChildren();status('QR ERROR: '+e.message)}}
-function finder(x,y,n){return (x<7&&y<7)||(x>=n-7&&y<7)||(x<7&&y>=n-7)}
+"use strict";
+const $ = (id) => document.getElementById(id);
+const ns = "http://www.w3.org/2000/svg";
+const BLACK = "#000000";
+const PINK = "#FF0088";
+let code = null;
+let cells = null;
+let busy = false;
+let cursorX = 0;
+let cursorY = 0;
+let regions = [];
+let selectedRegion = null;
 
-function resetCursor(){
- const n=code.modules.size;
- let best=-1,nearest=Infinity;
- for(let i=0;i<n*n;i++){
-  if(code.modules.reservedBit[i])continue;
-  const x=i%n,y=Math.floor(i/n);
-  const d=Math.abs(x-Math.floor(n/2))+Math.abs(y-Math.floor(n/2));
-  if(d<nearest){nearest=d;best=i}
- }
- cursorX=best>=0?best%n:0;
- cursorY=best>=0?Math.floor(best/n):0;
+function status(message) {
+  $("status").textContent = message;
 }
-function moveCursor(dx,dy){
- if(busy||!cells)return;
- const n=code.modules.size;
- cursorX=Math.max(0,Math.min(n-1,cursorX+dx));
- cursorY=Math.max(0,Math.min(n-1,cursorY+dy));
- paint();
+function expected() {
+  return $("data").value || " ";
 }
-function toggleCursor(){
- if(busy||!cells)return;
- const i=cursorY*code.modules.size+cursorX;
- if(code.modules.reservedBit[i]){status('LOCKED SQUARE. MOVE AGAIN.');return}
- flip(i);
+function lock(value) {
+  busy = value;
+  document.querySelectorAll("input,button").forEach((element) => {
+    element.disabled = value;
+  });
+  if (!value) $("erase").disabled = !selectedRegion;
 }
-function showCursorPosition(){
- const position=$('position');
- if(position)position.textContent='X '+String(cursorX+1).padStart(2,'0')+
-  ' Y '+String(cursorY+1).padStart(2,'0');
+function clearRegions() {
+  selectedRegion = null;
+  regions = [];
+  $("regionResults").replaceChildren();
+  $("erase").disabled = true;
 }
-function makeSvg(markers=false){
- const n=code.modules.size,fg='#000000',bg='#39ff14';
- const svg=el('svg',{xmlns:ns,viewBox:'-4 -4 '+(n+8)+' '+(n+8),width:800,height:800,'aria-label':'QR matrix'});
- svg.append(el('rect',{x:-4,y:-4,width:n+8,height:n+8,fill:bg}));
- for(let y=0;y<n;y++)for(let x=0;x<n;x++){
-  const i=y*n+x;
-  if(cells[i])svg.append(el('rect',{x,y,width:1,height:1,fill:fg}));
- }
- if(markers)for(let i=0;i<cells.length;i++){
-  if(code.modules.reservedBit[i]||!safe.has(i))continue;
-  const x=i%n,y=Math.floor(i/n);
-  svg.append(el('rect',{x:x+.2,y:y+.2,width:.6,height:.6,
-   fill:cells[i]?bg:fg,'pointer-events':'none'}));
- }
- if(markers){
-  // Marker is drawn only in the preview. Verification and exports remain clean.
-  svg.append(el('rect',{x:cursorX-.13,y:cursorY-.13,width:1.26,height:1.26,
-   fill:'none',stroke:bg,'stroke-width':.17,'pointer-events':'none'}));
-  svg.append(el('rect',{x:cursorX-.28,y:cursorY-.28,width:1.56,height:1.56,
-   fill:'none',stroke:fg,'stroke-width':.14,'pointer-events':'none'}));
- }
- if(markers&&selectedRegion){const r=selectedRegion;svg.append(el('rect',{x:r.x,y:r.y,width:r.w,height:r.h,fill:'none',stroke:fg,'stroke-width':.22,'stroke-dasharray':'.65 .4','pointer-events':'none'}));}
- return svg;
-}
-function paint(){if(cells){$('qr').replaceChildren(makeSvg(true));showCursorPosition()}}
-// Decode actual colors, shapes and finder decorations with a four-module quiet zone.
-async function verifies(){if(!cells)return false;const svg=makeSvg(),n=code.modules.size,canvas=document.createElement('canvas');canvas.width=canvas.height=(n+8)*8;const ctx=canvas.getContext('2d'),img=new Image(),url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});ctx.drawImage(img,0,0,canvas.width,canvas.height);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height);const result=QREngine.decode(pixels.data,pixels.width,pixels.height);return result?.data===expected()}finally{URL.revokeObjectURL(url)}}
-async function flip(i){if(busy||!cells||code.modules.reservedBit[i])return;lock(true);clearRegions();cells[i]^=1;try{const valid=await verifies();if(!valid)cells[i]^=1;safe.clear();paint();status(valid?'PIXEL SAVED. QR STILL READABLE.':'PIXEL BLOCKED. QR NOT READABLE.')}catch(e){cells[i]^=1;safe.clear();paint();status('PIXEL TEST FAILED. CHANGE UNDONE.')}finally{lock(false)}}
-async function findSafe(){if(busy||!cells)return;lock(true);clearRegions();safe.clear();const original=Uint8Array.from(cells);status('TESTING PIXELS...');try{
- // Sample throughout the symbol. Finder, timing, format and alignment modules stay locked.
- const candidates=[];for(let i=0;i<cells.length;i++)if(!code.modules.reservedBit[i])candidates.push(i);
- const count=Math.min(48,candidates.length);
- for(let j=0;j<count;j++){const i=candidates[Math.floor(j*candidates.length/count)];cells=Uint8Array.from(original);cells[i]^=1;if(await verifies())safe.add(i)}
- cells=original;paint();status(`${safe.size} SAFE PIXELS OF ${count} TESTED.`);
- }catch(e){cells=original;safe.clear();paint();status('PIXEL TEST FAILED.')}finally{cells=original;lock(false)}}
-['data','mask','level'].forEach(id=>$(id).addEventListener('input',rebuild));
-$('regions').onclick=findRegions;$('editable').onclick=findSafe;$('reset').onclick=rebuild;
-const directions={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
-for(const [name,[dx,dy]] of Object.entries(directions)){
- const button=$('move-'+name);
- if(button)button.addEventListener('click',()=>moveCursor(dx,dy));
-}
-if($('draw'))$('draw').addEventListener('click',toggleCursor);
-if(typeof document.addEventListener==='function'){
- document.addEventListener('keydown',event=>{
-  if(event.altKey||event.ctrlKey||event.metaKey||busy)return;
-  const active=document.activeElement;
-  const tag=active?.tagName;
-  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||active?.isContentEditable)return;
-  const keys={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
-  if(Object.hasOwn(keys,event.key)){
-   event.preventDefault();
-   moveCursor(...keys[event.key]);
-  }else if((event.key==='Enter'||event.key===' ')&&
-   (tag==='BODY'||tag==='HTML'||active?.id==='qr')){
-   event.preventDefault();
-   toggleCursor();
+function eraseRegion(original, region) {
+  const next = Uint8Array.from(original);
+  const size = code.modules.size;
+  for (let y = region.y; y < region.y + region.h; y++) {
+    for (let x = region.x; x < region.x + region.w; x++) {
+      next[y * size + x] = 0;
+    }
   }
- });
+  return next;
 }
-$('scan').onclick=async()=>{if(busy||!cells)return;lock(true);try{status(await verifies()?'SCAN OK. DATA MATCHES.':'SCAN FAILED. RESET QR.')}catch(e){status('SCAN TEST FAILED.')}finally{lock(false)}};
-async function download(ext){if(!cells||busy)return;lock(true);try{let blob=new Blob([new XMLSerializer().serializeToString(makeSvg())],{type:'image/svg+xml'});if(ext==='png'){const url=URL.createObjectURL(blob),image=new Image();try{await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url});const canvas=document.createElement('canvas');canvas.width=canvas.height=800;canvas.getContext('2d').drawImage(image,0,0,800,800);blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'))}finally{URL.revokeObjectURL(url)}}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='qr-art.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){status('EXPORT FAILED.')}finally{lock(false)}}
-$('png').onclick=()=>download('png');$('svg').onclick=()=>download('svg');rebuild();
-
+function element(tag, attrs) {
+  const node = document.createElementNS(ns, tag);
+  for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+  return node;
+}
+function makeSvg(preview = false) {
+  const size = code.modules.size;
+  const svg = element("svg", {
+    xmlns: ns,
+    viewBox: "-4 -4 " + (size + 8) + " " + (size + 8),
+    width: 800,
+    height: 800,
+    "aria-label": "קוד QR"
+  });
+  svg.append(element("rect", {
+    x: -4, y: -4, width: size + 8, height: size + 8, fill: PINK
+  }));
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (cells[y * size + x]) {
+        svg.append(element("rect", { x, y, width: 1, height: 1, fill: BLACK }));
+      }
+    }
+  }
+  if (preview && selectedRegion) {
+    const r = selectedRegion;
+    svg.append(element("rect", {
+      x: r.x - .12, y: r.y - .12, width: r.w + .24, height: r.h + .24,
+      fill: "none", stroke: PINK, "stroke-width": .24, "pointer-events": "none"
+    }));
+    svg.append(element("rect", {
+      x: r.x - .27, y: r.y - .27, width: r.w + .54, height: r.h + .54,
+      fill: "none", stroke: BLACK, "stroke-width": .16,
+      "stroke-dasharray": ".6 .3", "pointer-events": "none"
+    }));
+  }
+  if (preview) {
+    svg.append(element("rect", {
+      x: cursorX - .10, y: cursorY - .10, width: 1.20, height: 1.20,
+      fill: "none", stroke: PINK, "stroke-width": .20, "pointer-events": "none"
+    }));
+    svg.append(element("rect", {
+      x: cursorX - .22, y: cursorY - .22, width: 1.44, height: 1.44,
+      fill: "none", stroke: BLACK, "stroke-width": .12, "pointer-events": "none"
+    }));
+  }
+  return svg;
+}
+function paint() {
+  if (!cells) return;
+  $("qr").replaceChildren(makeSvg(true));
+  $("position").textContent =
+    "X: " + String(cursorX + 1).padStart(2, "0") +
+    " / Y: " + String(cursorY + 1).padStart(2, "0");
+}
+function resetCursor() {
+  const size = code.modules.size;
+  let best = -1;
+  let nearest = Infinity;
+  for (let i = 0; i < size * size; i++) {
+    if (code.modules.reservedBit[i]) continue;
+    const x = i % size;
+    const y = Math.floor(i / size);
+    const distance = Math.abs(x - Math.floor(size / 2)) +
+      Math.abs(y - Math.floor(size / 2));
+    if (distance < nearest) {
+      best = i;
+      nearest = distance;
+    }
+  }
+  cursorX = best < 0 ? 0 : best % size;
+  cursorY = best < 0 ? 0 : Math.floor(best / size);
+}
+function rebuild() {
+  if (busy) return;
+  clearRegions();
+  try {
+    code = QREngine.create(expected(), {
+      errorCorrectionLevel: "H",
+      maskPattern: 0
+    });
+    cells = Uint8Array.from(code.modules.data);
+    resetCursor();
+    paint();
+    status("הקוד מוכן לעריכה");
+  } catch (error) {
+    code = null;
+    cells = null;
+    $("qr").replaceChildren();
+    status("לא ניתן ליצור קוד: " + error.message);
+  }
+}
+function moveCursor(dx, dy) {
+  if (busy || !cells) return;
+  const size = code.modules.size;
+  cursorX = Math.max(0, Math.min(size - 1, cursorX + dx));
+  cursorY = Math.max(0, Math.min(size - 1, cursorY + dy));
+  paint();
+}
+async function verifies() {
+  if (!cells) return false;
+  const svg = makeSvg(false);
+  const size = code.modules.size;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = (size + 8) * 8;
+  const context = canvas.getContext("2d");
+  if (!context) return false;
+  const url = URL.createObjectURL(new Blob(
+    [new XMLSerializer().serializeToString(svg)],
+    { type: "image/svg+xml" }
+  ));
+  const image = new Image();
+  try {
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = url;
+    });
+    context.imageSmoothingEnabled = false;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+    const decoded = QREngine.decode(pixels.data, pixels.width, pixels.height);
+    return decoded?.data === expected();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+async function flip(index) {
+  if (busy || !cells) return;
+  if (code.modules.reservedBit[index]) {
+    status("המשבצת הזאת מוגנת. אפשר לעבור למשבצת אחרת.");
+    return;
+  }
+  lock(true);
+  clearRegions();
+  cells[index] ^= 1;
+  try {
+    if (await verifies()) {
+      status("השינוי נשמר. הקוד עדיין קריא.");
+    } else {
+      cells[index] ^= 1;
+      status("השינוי בוטל כדי לשמור על קריאות הקוד.");
+    }
+  } catch (_) {
+    cells[index] ^= 1;
+    status("בדיקת הקוד נכשלה. השינוי בוטל.");
+  } finally {
+    paint();
+    lock(false);
+  }
+}
+function toggleCursor() {
+  if (!cells || busy) return;
+  flip(cursorY * code.modules.size + cursorX);
+}
+function showRegions() {
+  const list = $("regionResults");
+  list.replaceChildren();
+  regions.forEach((region, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "אזור " + (index + 1) + " · " +
+      region.w + "×" + region.h + " משבצות";
+    button.setAttribute("aria-pressed", String(region === selectedRegion));
+    button.addEventListener("click", () => {
+      selectedRegion = region;
+      showRegions();
+      $("erase").disabled = false;
+      paint();
+      status("האזור סומן לתצוגה מקדימה. אפשר למחוק אותו.");
+    });
+    list.append(button);
+  });
+  $("erase").disabled = busy || !selectedRegion;
+}
+async function findRegions() {
+  if (!cells || busy) return;
+  lock(true);
+  clearRegions();
+  const original = Uint8Array.from(cells);
+  status("מחפש שטחים גדולים שאפשר למחוק...");
+  try {
+    if (!await verifies()) {
+      status("הקוד אינו קריא כרגע. יש לאפס את השינויים.");
+      return;
+    }
+    const result = await QRRegions.search({
+      size: code.modules.size,
+      reserved: code.modules.reservedBit,
+      dark: original,
+      verify: async (region) => {
+        cells = eraseRegion(original, region);
+        try {
+          return await verifies();
+        } finally {
+          cells = original;
+        }
+      },
+      progress: (count) => {
+        if (count % 12 === 0) {
+          status("בודק אפשרויות למחיקה... " + count + " בדיקות");
+        }
+      }
+    });
+    regions = result.regions;
+    selectedRegion = null;
+    showRegions();
+    status(regions.length
+      ? "נמצאו " + regions.length + " אפשרויות. בחרו אזור לתצוגה מקדימה."
+      : "לא נמצאו אזורים גדולים שאפשר למחוק בבטחה.");
+  } catch (_) {
+    clearRegions();
+    status("חיפוש האזורים נכשל. אפשר לנסות שוב.");
+  } finally {
+    cells = original;
+    lock(false);
+    paint();
+  }
+}
+async function deleteRegion() {
+  if (busy || !cells || !selectedRegion) return;
+  lock(true);
+  const original = Uint8Array.from(cells);
+  const chosen = selectedRegion;
+  try {
+    cells = eraseRegion(original, chosen);
+    if (await verifies()) {
+      clearRegions();
+      status("האזור נמחק. הקוד עדיין קריא.");
+    } else {
+      cells = original;
+      clearRegions();
+      status("המחיקה בוטלה כדי לשמור על קריאות הקוד.");
+    }
+  } catch (_) {
+    cells = original;
+    clearRegions();
+    status("המחיקה נכשלה. הקוד הוחזר למצבו הקודם.");
+  } finally {
+    paint();
+    lock(false);
+  }
+}
+async function download(ext) {
+  if (busy || !cells) return;
+  lock(true);
+  try {
+    let blob = new Blob(
+      [new XMLSerializer().serializeToString(makeSvg(false))],
+      { type: "image/svg+xml" }
+    );
+    if (ext === "png") {
+      const imageUrl = URL.createObjectURL(blob);
+      const image = new Image();
+      try {
+        await new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+          image.src = imageUrl;
+        });
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 800;
+        const context = canvas.getContext("2d");
+        context.imageSmoothingEnabled = false;
+        context.drawImage(image, 0, 0, 800, 800);
+        blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) throw new Error("PNG unavailable");
+      } finally {
+        URL.revokeObjectURL(imageUrl);
+      }
+    }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "qart." + ext;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status("הקובץ נשמר בפורמט " + ext.toUpperCase());
+  } catch (_) {
+    status("לא ניתן לשמור את הקובץ.");
+  } finally {
+    lock(false);
+  }
+}
+$("data").addEventListener("input", rebuild);
+$("regions").addEventListener("click", findRegions);
+$("erase").addEventListener("click", deleteRegion);
+$("reset").addEventListener("click", rebuild);
+$("draw").addEventListener("click", toggleCursor);
+$("png").addEventListener("click", () => download("png"));
+$("svg").addEventListener("click", () => download("svg"));
+const directions = {
+  up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0]
+};
+for (const [name, [dx, dy]] of Object.entries(directions)) {
+  $("move-" + name).addEventListener("click", () => moveCursor(dx, dy));
+}
+$("qr").addEventListener("click", () => $("qr").focus());
+document.addEventListener("keydown", (event) => {
+  if (busy || event.altKey || event.ctrlKey || event.metaKey) return;
+  const target = document.activeElement;
+  if (target && (
+    target.tagName === "INPUT" || target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT" || target.isContentEditable
+  )) return;
+  const keyMoves = {
+    ArrowUp: [0, -1], ArrowDown: [0, 1],
+    ArrowLeft: [-1, 0], ArrowRight: [1, 0]
+  };
+  if (Object.hasOwn(keyMoves, event.key)) {
+    event.preventDefault();
+    moveCursor(...keyMoves[event.key]);
+  } else if (event.code === "Space" || event.key === " ") {
+    event.preventDefault();
+    toggleCursor();
+  }
+});
+rebuild();

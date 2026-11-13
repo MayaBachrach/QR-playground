@@ -1,43 +1,26 @@
-# qArt
+# qArt — מסוף לעריכת QR
 
-An experimental, low-resolution QR matrix editor inspired by early computing instruments.
+A keyboard-first QR editor designed as a fictional 1955 computer terminal.
 
-The interface and generated QR use only **black (`#000000`) and marker green (`#39ff14`)**. The QR has fixed square modules and standard square finders. There are no color, dot-shape, or corner selectors, and no logo uploads.
+## Appearance
+- Only **black `#000000`** and **marker pink `#FF0088`**, throughout the interface and exported QR.
+- Hebrew, right-to-left interface; large readable text and square terminal controls.
+- No gradients, shadows, simulated low-resolution text, extra color/shape settings, or other styling options.
 
-## Editing without a mouse
+## Editing
+1. Enter a URL or text; a QR code is generated with high error correction.
+2. Move the selection with the arrow keys, and press **Space** to toggle a square. On mobile, use the arrow pad and the center edit button.
+3. Use **חפש אזורים למחיקה** to search for large rectangles that can be erased. Select a proposed region to preview it, then press **מחק אזור נבחר**.
+4. **איפוס שינויים** recreates the code from the text.
+5. Export PNG or SVG without the cursor/region preview.
 
-On a computer, use the **arrow keys** to move the matrix cursor and **Enter**
-or **Space** to flip the selected QR square. Locked QR structure squares cannot
-be changed. Use **Tab** and **Enter** to reach other controls.
+Protected QR squares cannot be changed. Edits and erased rectangles are checked with the built-in decoder, and rejected when validation fails. The bounded region search returns up to 3 verified candidates, not an exhaustive guarantee of the largest possible region.
 
-On phones, the large **direction pad** and **EDIT** button work the same way.
-Use the DRAW / SETTINGS tabs to switch panels. QR squares are not individually
-clickable, so editing is possible even on a small screen.
+**Note:** Black-on-pink QR codes may scan less reliably on some phone cameras than conventional black-on-white QR codes. Test exported codes with the intended device.
 
-The screen uses a deliberately small two-color framebuffer. Text is enlarged,
-not smoothed. The QR exported as PNG or SVG is clean and contains no cursor.
+## Running
+Static site: serve this directory with `python -m http.server 8765`, or use GitHub Pages. The QR engine is bundled locally; no remote script dependencies are needed.
 
-## Features
+The retired `lowres.js` file is intentionally not loaded. It previously impaired text readability.
 
-- Generate standard QR symbols for a URL or text and switch among eight mask patterns without changing the content.
-- Choose an error-correction level. Changing the mask or correction level resets manual pixel edits.
-- Edit individual non-reserved modules. Each change is decoded before it is accepted; unsuccessful edits are rolled back.
-- Search for separately validated regions that can be erased and preview before committing the deletion.
-- Sample individually editable modules for visual guides (test again after every change).
-- Decode the actual black/green SVG locally, export standard PNG or SVG, and use a full-screen low-resolution interface with nearest-neighbor enlargement.
-- Desktop fits the main work and control panels on one page. Mobile uses **MATRIX** and **CONTROLS** screens rather than shrinking all buttons. No document scrolling.
-
-## Run
-
-Serve as static files, for example `python -m http.server 8765`.
-GitHub Pages serves the committed site directly.
-
-The QR engine (`qr-engine.js`) is bundled locally and no external CDN is needed. To rebuild it: `npm ci && npm run build`.
-
-Run `npm test` for square-module QR decoding tests across different contents, error-correction levels, and masks. Run `node test-regions.cjs` for region-search invariants.
-
-## Readability and scanning
-
-The visible interface is captured into a reduced canvas and enlarged with nearest-neighbor scaling, without changing exported SVG/PNG data. Browser fallback shows the normal interactive DOM if low-resolution screen capture is unavailable.
-
-Bright green on black can look different from black on green in a scanner, so the QR itself uses **black squares on the green background** with a four-module quiet zone. A passing browser decoder does not guarantee that all phone cameras or print conditions will scan the QR. Test with a real camera at the intended size.
+Run `npm test` and `node test-regions.cjs` for the existing engine and region-search tests.
