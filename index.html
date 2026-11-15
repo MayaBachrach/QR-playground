@@ -26,7 +26,20 @@
     font: 1.0625rem/1.4 var(--osd);
     padding: clamp(.55rem, 3vw, 2.5rem);
   }
-  .terminal { width: min(100%, 56rem); }
+  .terminal { width: min(100%, 54rem); }
+  .navigation { margin-bottom: .75rem; border-bottom: 2px solid; padding-bottom: .5rem; }
+  .stops { display: grid; grid-template-columns: repeat(3, 1fr); gap: .25em; margin: 0 0 .3em; padding: 0; list-style: none; }
+  .stops li { text-align: center; border: 1px solid; font-family: "qArt OSD", var(--osd); }
+  .stops li::before { content: "◀" / ""; margin-inline-end: .35em; visibility: hidden; }
+  .terminal:has(.prompt:focus-within) .stops li:nth-child(1),
+  .terminal:has(.matrix:focus-within) .stops li:nth-child(2),
+  .terminal:has(.commands:focus-within) .stops li:nth-child(3) {
+    background: var(--ink); color: var(--screen); border-color: var(--ink);
+  }
+  .terminal:has(.prompt:focus-within) .stops li:nth-child(1)::before,
+  .terminal:has(.matrix:focus-within) .stops li:nth-child(2)::before,
+  .terminal:has(.commands:focus-within) .stops li:nth-child(3)::before { visibility: visible; }
+  .tab-help { text-align: center; }
   h1, h2, p, dl, dt, dd { margin: 0; }
   h1 { font-size: clamp(1.3rem, 4vw, 2rem); padding-inline: .2em; white-space: nowrap; }
   h2 { font-size: 1.05em; }
@@ -48,7 +61,7 @@
   input::selection { background: var(--ink); color: var(--screen); }
   .prompt:focus-within input::selection { background: var(--screen); color: var(--ink); }
   .work { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 5vw, 3rem); }
-  .commands { min-width: 0; }
+  .commands { min-width: 0; grid-column: 1; grid-row: 1; }
   .menu-heading { display: flex; align-items: center; gap: .55em; margin-bottom: .35em; }
   .menu-heading::after { content: ""; flex: 1; border-top: 1px dashed; }
   #paste-help { margin-bottom: .5em; }
@@ -56,9 +69,9 @@
     padding-block: .4em; border-top: 1px dashed;
     display: grid; gap: .18em;
   }
-  .command { display: grid; grid-template-columns: 1.1em minmax(0, 1fr) 6ch; gap: .35em; }
-  dt { grid-column: 3; grid-row: 1; text-align: left; white-space: nowrap; }
-  dd { grid-column: 2; grid-row: 1; }
+  .command { display: grid; grid-template-columns: minmax(0, 1fr) 6ch; gap: .35em; }
+  dt { grid-column: 2; grid-row: 1; text-align: left; white-space: nowrap; }
+  dd { grid-column: 1; grid-row: 1; }
   .action, .region-choice {
     width: 100%; border: 0; padding: 0; background: var(--screen); color: var(--ink);
     font: inherit; text-align: inherit;
@@ -83,7 +96,7 @@
     display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3em;
   }
   .slots li { min-width: 0; min-height: 1.4em; white-space: nowrap; text-align: center; border: 1px solid; }
-  .matrix { min-width: 0; justify-self: center; width: min(100%, 50svh, 24rem); }
+  .matrix { grid-column: 2; grid-row: 1; min-width: 0; justify-self: center; width: min(100%, 50svh, 24rem); }
   .readout {
     display: flex; align-items: baseline; justify-content: space-between; gap: .35em;
     font-size: .85em; margin-bottom: .4em; white-space: nowrap;
@@ -101,13 +114,15 @@
   h1, .commands, .readout, .status-line { filter: blur(.25px); }
   @media (max-width: 45rem) {
     .work { grid-template-columns: 1fr; gap: .6rem; }
-    .matrix { grid-row: 1; width: min(100%, 30svh, 19rem); }
+    .commands { grid-row: 2; }
+    .matrix { grid-column: 1; grid-row: 1; width: min(100%, 30svh, 19rem); }
     .commands dl { padding-block: .2em; gap: 0; }
     .status-line { margin-top: .55rem; }
   }
   @media (max-width: 45rem) and (max-height: 650px) {
     body { font-size: .9375rem; line-height: 1.25; }
-    header, .prompt { margin-bottom: .5rem; }
+    header, .prompt, .navigation { margin-bottom: .4rem; }
+    .navigation { padding-bottom: .25rem; }
     .matrix { width: min(100%, max(8.5rem, 21svh)); }
     .readout { margin-inline: -.4em; }
     #status { block-size: 2.55em; }
@@ -117,6 +132,10 @@
 <body>
 <main class="terminal">
   <header><h1>תפריט <bdi>qArt</bdi></h1></header>
+  <section class="navigation" aria-label="סדר המעבר במקלדת">
+    <ol class="stops"><li>קישור</li><li><bdi>QR</bdi></li><li>תפריט</li></ol>
+    <p class="tab-help"><bdi><kbd>TAB</kbd></bdi> קדימה · <bdi><kbd>SHIFT+TAB</kbd></bdi> אחורה</p>
+  </section>
   <form id="prompt" class="prompt" dir="ltr">
     <label for="data" dir="rtl">קישור</label>
     <span aria-hidden="true">&gt;</span>
@@ -124,6 +143,10 @@
            autocomplete="off" aria-keyshortcuts="Control+V Meta+V" aria-describedby="paste-help" autofocus>
   </form>
   <div class="work">
+    <section class="matrix">
+      <div class="readout"><span>מטריצת עריכה</span><bdi id="position">X: 00 / Y: 00</bdi></div>
+      <div id="qr" tabindex="0" role="img" aria-label="מטריצת קוד QR"></div>
+    </section>
     <section class="commands" id="commands" aria-label="פקודות מקלדת">
       <h2 class="menu-heading">פקודות מקלדת</h2>
       <p id="paste-help">הדביקו קישור ולחצו <bdi><kbd>ENTER</kbd></bdi>.</p>
@@ -132,8 +155,8 @@
         <div class="command"><dt><bdi><kbd>◀▲▼▶</kbd></bdi></dt><dd>תנועה בין משבצות</dd></div>
         <div class="command"><dt><kbd>רווח</kbd></dt><dd>סימון / ביטול</dd></div>
       </dl>
-      <p class="menu-help"><bdi><kbd>M</kbd></bdi> לתפריט · <bdi><kbd>▲▼</kbd></bdi> לבחירה · <bdi><kbd>ENTER</kbd></bdi> להפעלה</p>
-      <button type="button" class="action" data-command="KeyF" tabindex="-1"><span class="action-name">חיפוש אזורים</span><kbd>F</kbd></button>
+      <p class="menu-help"><bdi><kbd>▲▼</kbd></bdi> לבחירה · <bdi><kbd>ENTER</kbd></bdi> להפעלה</p>
+      <button type="button" class="action" data-command="KeyF" tabindex="0"><span class="action-name">חיפוש אזורים</span><kbd>F</kbd></button>
       <div class="region-readout">
         <h2>אזורים מאומתים <bdi>1–3</bdi></h2>
         <ol class="slots" id="regionResults">
@@ -146,10 +169,6 @@
       <button type="button" class="action" data-command="KeyR" tabindex="-1"><span class="action-name">איפוס שינויים</span><kbd>R</kbd></button>
       <button type="button" class="action" data-command="KeyP" tabindex="-1"><span class="action-name">הורדת <bdi>PNG</bdi></span><kbd>P</kbd></button>
       <button type="button" class="action" data-command="KeyS" tabindex="-1"><span class="action-name">הורדת <bdi>SVG</bdi></span><kbd>S</kbd></button>
-    </section>
-    <section class="matrix">
-      <div class="readout"><span>מטריצת עריכה</span><bdi id="position">X: 00 / Y: 00</bdi></div>
-      <div id="qr" tabindex="0" role="img" aria-label="מטריצת קוד QR"></div>
     </section>
   </div>
   <div class="status-line"><span class="status-label" aria-hidden="true">מצב</span><p id="status" role="status">המסוף מוכן</p></div>

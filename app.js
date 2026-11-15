@@ -325,6 +325,14 @@ const input = $("data");
 const matrix = $("qr");
 const menu = $("commands");
 const menuItems = Array.from(document.querySelectorAll("#commands button[data-command]"));
+menu.addEventListener("focusin", (event) => {
+  if (!menuItems.includes(event.target)) return;
+  for (const item of menuItems) item.tabIndex = item === event.target ? 0 : -1;
+});
+menu.addEventListener("focusout", (event) => {
+  if (menuItems.includes(event.relatedTarget)) return;
+  for (const [index, item] of menuItems.entries()) item.tabIndex = index === 0 ? 0 : -1;
+});
 function moveMenu(item, dx, dy) {
   const rows = [];
   for (const candidate of menuItems) {
