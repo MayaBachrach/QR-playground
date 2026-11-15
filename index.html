@@ -6,86 +6,95 @@
 <meta name="theme-color" content="#000000">
 <title>qArt — מסוף עריכת QR</title>
 <style>
-  :root { --ink: #FF0088; --screen: #000000; color-scheme: dark; }
+  :root {
+    --ink: #FF0088;
+    --screen: #000000;
+    --osd: "Miriam Fixed", "Courier New", monospace;
+    color-scheme: dark;
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0; min-height: 100svh; display: grid;
     grid-template-columns: minmax(0, 1fr); place-items: center;
     background: var(--screen); color: var(--ink);
-    font: 1.0625rem/1.4 Arial, sans-serif;
-    padding: clamp(.5rem, 2vw, 1.5rem);
+    font: 1.0625rem/1.4 var(--osd);
+    padding: clamp(.55rem, 3vw, 2.5rem);
   }
-  .terminal {
-    width: min(100%, 57rem); padding: clamp(.85rem, 3.2vw, 2.25rem);
-    border: 1px solid; border-radius: 6% / 8%;
+  .terminal { width: min(100%, 56rem); }
+  h1, h2, p, dl, dt, dd { margin: 0; }
+  h1 { font-size: clamp(1.3rem, 4vw, 2rem); padding-inline: .45em; white-space: nowrap; }
+  h2 { font-size: 1.05em; }
+  header {
+    display: flex; align-items: center; gap: .8rem; margin-bottom: .9rem;
   }
-  header, .prompt, .readout { display: flex; align-items: baseline; gap: .65rem; }
-  header, .readout { justify-content: space-between; }
-  header { border-bottom: 1px dashed; padding-bottom: .55rem; }
-  h1, h2, p { margin: 0; }
-  h1 { font-size: 1.65rem; }
-  h2 { font-size: 1rem; }
-  .prompt { margin-block: .85rem 1rem; border-bottom: 1px solid; }
-  .prompt:focus-within { border-bottom-width: 2px; margin-bottom: calc(1rem - 1px); }
-  .prompt label { font-weight: bold; }
+  header::before, header::after { content: ""; flex: 1; border-top: .15em dashed; }
+  .prompt {
+    display: flex; align-items: baseline; gap: .65em;
+    padding: .25em .5em; margin-bottom: 1rem; border: 1px solid;
+  }
+  .prompt:focus-within { background: var(--ink); color: var(--screen); }
+  .prompt label { white-space: nowrap; }
   input {
-    background: var(--screen); color: var(--ink); caret-color: var(--ink);
-    outline: none; border: 0; min-width: 0; flex: 1; padding: .3rem 0;
-    font: inherit; font-family: "Courier New", monospace;
+    background: inherit; color: inherit; caret-color: currentColor;
+    outline: none; border: 0; min-width: 0; flex: 1; padding: .15em 0; font: inherit;
   }
   input::selection { background: var(--ink); color: var(--screen); }
-  .work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1rem, 4vw, 2.75rem); align-items: start; }
+  .prompt:focus-within input::selection { background: var(--screen); color: var(--ink); }
+  .work { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 5vw, 3rem); }
   .commands { min-width: 0; }
-  #paste-help { margin-block-end: .7rem; }
+  .menu-heading { display: flex; align-items: center; gap: .55em; margin-bottom: .35em; }
+  .menu-heading::after { content: ""; flex: 1; border-top: 1px dashed; }
+  #paste-help { margin-bottom: .5em; }
   .commands dl {
-    margin: 0; padding-block: .55rem; border-top: 1px dashed;
-    display: grid; grid-template-columns: 6ch 1fr; gap: .22rem .6rem;
+    padding-block: .4em; border-top: 1px dashed;
+    display: grid; gap: .18em;
   }
-  dt, dd { margin: 0; }
-  dt { white-space: nowrap; }
-  kbd, bdi { font-family: "Courier New", monospace; }
-  .region-readout { border-top: 1px dashed; padding-top: .55rem; }
+  .command { display: grid; grid-template-columns: 1.1em minmax(0, 1fr) 6ch; gap: .35em; }
+  .command::before { content: "◀" / ""; grid-column: 1; grid-row: 1; }
+  dt { grid-column: 3; grid-row: 1; text-align: left; white-space: nowrap; }
+  dd { grid-column: 2; grid-row: 1; }
+  kbd, bdi { font: inherit; }
+  .region-readout { border-top: 1px dashed; padding-top: .45em; }
   .slots {
-    margin: .3rem 0 0; padding: 0; list-style: none;
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .3rem; font-size: .88rem;
+    margin: .2em 0 0; padding: 0; list-style: none;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3em;
   }
-  .slots li { padding-inline: .2rem; min-height: 1.4em; white-space: nowrap; text-align: center; }
+  .slots li { min-height: 1.4em; white-space: nowrap; text-align: center; border: 1px solid; }
   .slots .selected { background: var(--ink); color: var(--screen); }
-  .matrix { min-width: 0; justify-self: center; width: min(100%, 49svh, 25rem); }
-  .readout { font-size: .88rem; padding-bottom: .4rem; white-space: nowrap; }
-  #qr { aspect-ratio: 1; outline: 1px dashed; outline-offset: 3px; }
+  .matrix { min-width: 0; justify-self: center; width: min(100%, 50svh, 24rem); }
+  .readout {
+    display: flex; align-items: baseline; justify-content: space-between; gap: .35em;
+    font-size: .85em; margin-bottom: .4em; white-space: nowrap;
+  }
+  .matrix:focus-within .readout { background: var(--ink); color: var(--screen); }
+  #qr { aspect-ratio: 1; outline: 1px solid; outline-offset: 3px; }
   #qr:focus { outline: 2px solid; }
   #qr svg { display: block; width: 100%; height: 100%; }
-  #status {
-    border-top: 1px dashed; margin-top: 1rem; padding-top: .55rem;
-    block-size: 3.45em; overflow: auto; overflow-wrap: anywhere;
+  .status-line {
+    display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .55em;
+    border-top: .15em dashed; margin-top: 1rem; padding-top: .5em;
   }
-  h1, .commands, .readout, #status { filter: blur(.27px); }
-  @media (max-width: 44rem) {
-    .work { grid-template-columns: 1fr; gap: .7rem; }
-    .matrix { grid-row: 1; width: min(100%, 31svh, 19rem); }
-    .commands dl { padding-block: .3rem; gap: .05rem .5rem; }
-    #paste-help { margin-block-end: .35rem; }
-    #status { margin-top: .55rem; }
+  .status-label { align-self: start; background: var(--ink); color: var(--screen); padding-inline: .35em; }
+  #status { block-size: 2.85em; overflow: auto; overflow-wrap: anywhere; }
+  h1, .commands, .readout, .status-line { filter: blur(.28px); }
+  @media (max-width: 45rem) {
+    .work { grid-template-columns: 1fr; gap: .6rem; }
+    .matrix { grid-row: 1; width: min(100%, 30svh, 19rem); }
+    .commands dl { padding-block: .2em; gap: 0; }
+    .status-line { margin-top: .55rem; }
   }
-  @media (max-width: 44rem) and (max-height: 650px) {
+  @media (max-width: 45rem) and (max-height: 650px) {
     body { font-size: .9375rem; line-height: 1.25; }
-    h1 { font-size: 1.35rem; }
-    .work { gap: .45rem; }
-    .matrix { width: min(100%, max(9rem, 23svh)); }
-    .readout { font-size: .75rem; margin-inline: -1rem; }
-    .commands dl { padding-block: .17rem; }
-    .region-readout { padding-top: .25rem; }
-    #status { block-size: 2.55em; padding-top: .25rem; }
-    .prompt { margin-block: .4rem .6rem; }
-    .prompt:focus-within { margin-bottom: calc(.6rem - 1px); }
+    header, .prompt { margin-bottom: .5rem; }
+    .matrix { width: min(100%, max(9rem, 22svh)); }
+    .readout { margin-inline: -.4em; }
+    #status { block-size: 2.55em; }
   }
 </style>
 </head>
 <body>
 <main class="terminal">
-  <header><h1>מסוף qArt</h1><bdi>1955</bdi></header>
+  <header><h1>תפריט <bdi>qArt</bdi></h1></header>
   <form id="prompt" class="prompt" dir="ltr">
     <label for="data" dir="rtl">קישור</label>
     <span aria-hidden="true">&gt;</span>
@@ -94,20 +103,21 @@
   </form>
   <div class="work">
     <section class="commands" aria-label="פקודות מקלדת">
-      <p id="paste-help">להתחלה, הדביקו קישור ולחצו <bdi><kbd>Enter</kbd></bdi>.</p>
+      <h2 class="menu-heading">פקודות מקלדת</h2>
+      <p id="paste-help">הדביקו קישור ולחצו <bdi><kbd>ENTER</kbd></bdi>.</p>
       <dl>
-        <dt><bdi><kbd>Esc</kbd></bdi></dt><dd>מעבר בין הקישור למטריצה</dd>
-        <dt><bdi><kbd>← ↑ ↓ →</kbd></bdi></dt><dd>תנועה במטריצה</dd>
-        <dt><kbd>רווח</kbd></dt><dd>סימון או ביטול סימון</dd>
+        <div class="command"><dt><bdi><kbd>ESC</kbd></bdi></dt><dd>מעבר לקישור או לעריכה</dd></div>
+        <div class="command"><dt><bdi><kbd>◀▲▼▶</kbd></bdi></dt><dd>תנועה בין משבצות</dd></div>
+        <div class="command"><dt><kbd>רווח</kbd></dt><dd>סימון / ביטול</dd></div>
       </dl>
       <dl>
-        <dt><bdi><kbd>F</kbd></bdi></dt><dd>חיפוש אזורים בטוחים למחיקה</dd>
-        <dt><bdi><kbd>1–3</kbd></bdi></dt><dd>בחירת אזור לתצוגה מקדימה</dd>
-        <dt><bdi><kbd>Del</kbd></bdi></dt><dd>מחיקת האזור הנבחר</dd>
+        <div class="command"><dt><bdi><kbd>F</kbd></bdi></dt><dd>חיפוש אזורים למחיקה</dd></div>
+        <div class="command"><dt><bdi><kbd>1–3</kbd></bdi></dt><dd>תצוגת אזור</dd></div>
+        <div class="command"><dt><bdi><kbd>DEL</kbd></bdi></dt><dd>מחיקת אזור נבחר</dd></div>
       </dl>
       <dl>
-        <dt><bdi><kbd>R</kbd></bdi></dt><dd>איפוס שינויים</dd>
-        <dt><bdi><kbd>P</kbd> / <kbd>S</kbd></bdi></dt><dd>הורדת <bdi>PNG / SVG</bdi></dd>
+        <div class="command"><dt><bdi><kbd>R</kbd></bdi></dt><dd>איפוס שינויים</dd></div>
+        <div class="command"><dt><bdi><kbd>P/S</kbd></bdi></dt><dd>הורדת <bdi>PNG / SVG</bdi></dd></div>
       </dl>
       <div class="region-readout">
         <h2>אזורים מאומתים</h2>
@@ -121,7 +131,7 @@
       <div id="qr" tabindex="0" role="img" aria-label="מטריצת קוד QR"></div>
     </section>
   </div>
-  <p id="status" role="status">המסוף מוכן</p>
+  <div class="status-line"><span class="status-label" aria-hidden="true">מצב</span><p id="status" role="status">המסוף מוכן</p></div>
 </main>
 <script src="qr-engine.js"></script>
 <script src="regions.js"></script>
