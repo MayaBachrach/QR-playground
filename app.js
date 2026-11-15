@@ -3,6 +3,7 @@ const $ = (id) => document.getElementById(id);
 const ns = "http://www.w3.org/2000/svg";
 const BLACK = "#000000";
 const PINK = "#FF0088";
+let payload = $("data").value;
 let code = null;
 let cells = null;
 let busy = false;
@@ -14,21 +15,13 @@ let selectedRegion = null;
 function status(message) {
   $("status").textContent = message;
 }
-function expected() {
-  return $("data").value || " ";
-}
 function lock(value) {
   busy = value;
-  document.querySelectorAll("input,button").forEach((element) => {
-    element.disabled = value;
-  });
-  if (!value) $("erase").disabled = !selectedRegion;
 }
 function clearRegions() {
   selectedRegion = null;
   regions = [];
-  $("regionResults").replaceChildren();
-  $("erase").disabled = true;
+  showRegions();
 }
 function eraseRegion(original, region) {
   const next = Uint8Array.from(original);
@@ -113,23 +106,24 @@ function resetCursor() {
   cursorX = best < 0 ? 0 : best % size;
   cursorY = best < 0 ? 0 : Math.floor(best / size);
 }
-function rebuild() {
+function rebuild(nextPayload = payload) {
   if (busy) return;
-  clearRegions();
   try {
-    code = QREngine.create(expected(), {
+    const nextCode = QREngine.create(nextPayload, {
       errorCorrectionLevel: "H",
       maskPattern: 0
     });
+    code = nextCode;
+    payload = nextPayload;
+    clearRegions();
     cells = Uint8Array.from(code.modules.data);
     resetCursor();
     paint();
     status("הקוד מוכן לעריכה");
-  } catch (error) {
-    code = null;
-    cells = null;
-    $("qr").replaceChildren();
-    status("לא ניתן ליצור קוד: " + error.message);
+    return true;
+  } catch (_) {
+    status("לא ניתן ליצור קוד מהקישור הזה. נסו קישור קצר יותר.");
+    return false;
   }
 }
 function moveCursor(dx, dy) {
@@ -162,7 +156,7 @@ async function verifies() {
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
     const decoded = QREngine.decode(pixels.data, pixels.width, pixels.height);
-    return decoded?.data === expected();
+    return decoded?.data === payload;
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -196,24 +190,23 @@ function toggleCursor() {
   flip(cursorY * code.modules.size + cursorX);
 }
 function showRegions() {
-  const list = $("regionResults");
-  list.replaceChildren();
-  regions.forEach((region, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = "אזור " + (index + 1) + " · " +
-      region.w + "×" + region.h + " משבצות";
-    button.setAttribute("aria-pressed", String(region === selectedRegion));
-    button.addEventListener("click", () => {
-      selectedRegion = region;
-      showRegions();
-      $("erase").disabled = false;
-      paint();
-      status("האזור סומן לתצוגה מקדימה. אפשר למחוק אותו.");
-    });
-    list.append(button);
+  Array.from($("regionResults").children).forEach((slot, index) => {
+    const region = regions[index];
+    const selected = Boolean(region && region === selectedRegion);
+    slot.classList.toggle("selected", selected);
+    slot.textContent = (index + 1) + " · " +
+      (region ? region.w + "×" + region.h : "—") + (selected ? " נבחר" : "");
   });
-  $("erase").disabled = busy || !selectedRegion;
+}
+function chooseRegion(index) {
+  if (!regions[index]) {
+    status("אין אזור במספר הזה. לחצו F לחיפוש.");
+    return;
+  }
+  selectedRegion = regions[index];
+  showRegions();
+  paint();
+  status("אזור " + (index + 1) + " נבחר. לחצו Del למחיקה.");
 }
 async function findRegions() {
   if (!cells || busy) return;
@@ -326,37 +319,62 @@ async function download(ext) {
     lock(false);
   }
 }
-$("data").addEventListener("input", rebuild);
-$("regions").addEventListener("click", findRegions);
-$("erase").addEventListener("click", deleteRegion);
-$("reset").addEventListener("click", rebuild);
-$("draw").addEventListener("click", toggleCursor);
-$("png").addEventListener("click", () => download("png"));
-$("svg").addEventListener("click", () => download("svg"));
+const input = $("data");
+const matrix = $("qr");
 const directions = {
-  up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0]
+  ArrowUp: [0, -1], ArrowDown: [0, 1],
+  ArrowLeft: [-1, 0], ArrowRight: [1, 0]
 };
-for (const [name, [dx, dy]] of Object.entries(directions)) {
-  $("move-" + name).addEventListener("click", () => moveCursor(dx, dy));
-}
-$("qr").addEventListener("click", () => $("qr").focus());
-document.addEventListener("keydown", (event) => {
-  if (busy || event.altKey || event.ctrlKey || event.metaKey) return;
-  const target = document.activeElement;
-  if (target && (
-    target.tagName === "INPUT" || target.tagName === "TEXTAREA" ||
-    target.tagName === "SELECT" || target.isContentEditable
-  )) return;
-  const keyMoves = {
-    ArrowUp: [0, -1], ArrowDown: [0, 1],
-    ArrowLeft: [-1, 0], ArrowRight: [1, 0]
-  };
-  if (Object.hasOwn(keyMoves, event.key)) {
-    event.preventDefault();
-    moveCursor(...keyMoves[event.key]);
-  } else if (event.code === "Space" || event.key === " ") {
-    event.preventDefault();
-    toggleCursor();
+const commands = {
+  Space: toggleCursor,
+  KeyF: findRegions,
+  Digit1: () => chooseRegion(0),
+  Digit2: () => chooseRegion(1),
+  Digit3: () => chooseRegion(2),
+  Delete: () => selectedRegion ? deleteRegion() : status("בחרו אזור עם 1–3 לפני המחיקה."),
+  KeyR: () => rebuild(),
+  KeyP: () => download("png"),
+  KeyS: () => download("svg")
+};
+$("prompt").addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (busy) return;
+  const value = input.value.trim();
+  if (!value) {
+    status("הדביקו קישור או הקלידו טקסט ליצירת קוד.");
+    return;
+  }
+  if (rebuild(value)) {
+    input.value = value;
+    matrix.focus({ preventScroll: true });
   }
 });
+input.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || event.isComposing) return;
+  event.preventDefault();
+  input.value = payload;
+  matrix.focus({ preventScroll: true });
+});
+matrix.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    input.focus({ preventScroll: true });
+    input.select();
+  } else if (Object.hasOwn(directions, event.key)) {
+    event.preventDefault();
+    moveCursor(...directions[event.key]);
+  } else if (Object.hasOwn(commands, event.code)) {
+    event.preventDefault();
+    if (!busy && !event.repeat) commands[event.code]();
+  }
+});
+matrix.addEventListener("paste", (event) => {
+  const value = event.clipboardData?.getData("text/plain");
+  if (!value) return;
+  event.preventDefault();
+  input.value = value.trim();
+  input.focus({ preventScroll: true });
+});
 rebuild();
+input.select();
