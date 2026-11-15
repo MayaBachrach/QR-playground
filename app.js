@@ -195,7 +195,8 @@ function showRegions() {
     const selected = Boolean(region && region === selectedRegion);
     slot.classList.toggle("selected", selected);
     slot.textContent = (index + 1) + " · " +
-      (region ? region.w + "×" + region.h : "—") + (selected ? " נבחר" : "");
+      (region ? region.w + "×" + region.h : "—");
+    slot.setAttribute("aria-current", String(selected));
   });
 }
 function chooseRegion(index) {
@@ -377,4 +378,5 @@ matrix.addEventListener("paste", (event) => {
   input.focus({ preventScroll: true });
 });
 rebuild();
+status("מוכן להדבקה עם Ctrl+V או ⌘+V");
 input.select();

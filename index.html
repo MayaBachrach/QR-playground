@@ -9,57 +9,77 @@
   :root { --ink: #FF0088; --screen: #000000; color-scheme: dark; }
   * { box-sizing: border-box; }
   body {
-    margin: 0; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center;
+    margin: 0; min-height: 100svh; display: grid;
+    grid-template-columns: minmax(0, 1fr); place-items: center;
     background: var(--screen); color: var(--ink);
-    font: 1rem/1.35 "Courier New", "Arial", monospace;
-    padding: clamp(.4rem, 2vw, 1.5rem);
+    font: 1.0625rem/1.4 Arial, sans-serif;
+    padding: clamp(.5rem, 2vw, 1.5rem);
   }
   .terminal {
-    width: min(100%, 62rem); padding: clamp(.75rem, 3vw, 2rem);
-    border: 2px solid; border-radius: 5% / 8%;
+    width: min(100%, 57rem); padding: clamp(.85rem, 3.2vw, 2.25rem);
+    border: 1px solid; border-radius: 6% / 8%;
   }
-  header, .prompt, .readout { display: flex; align-items: baseline; gap: .6rem; }
+  header, .prompt, .readout { display: flex; align-items: baseline; gap: .65rem; }
   header, .readout { justify-content: space-between; }
-  header { border-bottom: 1px dashed; padding-bottom: .45rem; }
+  header { border-bottom: 1px dashed; padding-bottom: .55rem; }
   h1, h2, p { margin: 0; }
-  h1 { font-size: 1.3rem; }
+  h1 { font-size: 1.65rem; }
   h2 { font-size: 1rem; }
-  .prompt { margin-block: .65rem; border-bottom: 1px solid; }
-  .prompt:focus-within { border-bottom-width: 2px; margin-bottom: calc(.65rem - 1px); }
+  .prompt { margin-block: .85rem 1rem; border-bottom: 1px solid; }
+  .prompt:focus-within { border-bottom-width: 2px; margin-bottom: calc(1rem - 1px); }
+  .prompt label { font-weight: bold; }
   input {
     background: var(--screen); color: var(--ink); caret-color: var(--ink);
-    outline: none; border: 0; min-width: 0; flex: 1; font: inherit; padding: .35rem;
+    outline: none; border: 0; min-width: 0; flex: 1; padding: .3rem 0;
+    font: inherit; font-family: "Courier New", monospace;
   }
   input::selection { background: var(--ink); color: var(--screen); }
-  .work { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(.6rem, 3vw, 2rem); align-items: center; }
-  .commands { font: .94rem/1.4 Arial, sans-serif; }
-  .commands dl { margin: .4rem 0 .65rem; display: grid; grid-template-columns: max-content 1fr; gap: .25rem .6rem; }
+  .work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1rem, 4vw, 2.75rem); align-items: start; }
+  .commands { min-width: 0; }
+  #paste-help { margin-block-end: .7rem; }
+  .commands dl {
+    margin: 0; padding-block: .55rem; border-top: 1px dashed;
+    display: grid; grid-template-columns: 6ch 1fr; gap: .22rem .6rem;
+  }
   dt, dd { margin: 0; }
+  dt { white-space: nowrap; }
   kbd, bdi { font-family: "Courier New", monospace; }
-  .slots { margin: .3rem 0 0; padding: 0; list-style: none; }
-  .slots li { padding-inline: .25rem; min-height: 1.4em; white-space: nowrap; }
+  .region-readout { border-top: 1px dashed; padding-top: .55rem; }
+  .slots {
+    margin: .3rem 0 0; padding: 0; list-style: none;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .3rem; font-size: .88rem;
+  }
+  .slots li { padding-inline: .2rem; min-height: 1.4em; white-space: nowrap; text-align: center; }
   .slots .selected { background: var(--ink); color: var(--screen); }
-  .matrix { min-width: 0; justify-self: center; width: min(100%, 52svh, 31rem); }
-  .readout { font-size: .84rem; padding-bottom: .35rem; }
+  .matrix { min-width: 0; justify-self: center; width: min(100%, 49svh, 25rem); }
+  .readout { font-size: .88rem; padding-bottom: .4rem; white-space: nowrap; }
   #qr { aspect-ratio: 1; outline: 1px dashed; outline-offset: 3px; }
   #qr:focus { outline: 2px solid; }
   #qr svg { display: block; width: 100%; height: 100%; }
   #status {
-    border-top: 1px dashed; margin-top: .9rem; padding-top: .45rem;
+    border-top: 1px dashed; margin-top: 1rem; padding-top: .55rem;
     block-size: 3.45em; overflow: auto; overflow-wrap: anywhere;
   }
-  @media (max-width: 40rem) {
-    .work { grid-template-columns: 1fr; }
-    .matrix { grid-row: 1; width: min(100%, 39svh, 20rem); }
-    .commands dl { gap: .1rem .5rem; }
-    .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .2rem; }
-    .slots li { font-size: .82rem; }
+  h1, .commands, .readout, #status { filter: blur(.27px); }
+  @media (max-width: 44rem) {
+    .work { grid-template-columns: 1fr; gap: .7rem; }
+    .matrix { grid-row: 1; width: min(100%, 31svh, 19rem); }
+    .commands dl { padding-block: .3rem; gap: .05rem .5rem; }
+    #paste-help { margin-block-end: .35rem; }
+    #status { margin-top: .55rem; }
   }
-  @media (max-width: 40rem) and (max-height: 650px) {
-    .matrix { width: min(100%, 27svh); }
-    .commands { font-size: .86rem; }
-    .commands dl { gap: 0 .5rem; }
-    #status { margin-top: .6rem; }
+  @media (max-width: 44rem) and (max-height: 650px) {
+    body { font-size: .9375rem; line-height: 1.25; }
+    h1 { font-size: 1.35rem; }
+    .work { gap: .45rem; }
+    .matrix { width: min(100%, max(9rem, 23svh)); }
+    .readout { font-size: .75rem; margin-inline: -1rem; }
+    .commands dl { padding-block: .17rem; }
+    .region-readout { padding-top: .25rem; }
+    #status { block-size: 2.55em; padding-top: .25rem; }
+    .prompt { margin-block: .4rem .6rem; }
+    .prompt:focus-within { margin-bottom: calc(.6rem - 1px); }
   }
 </style>
 </head>
@@ -70,25 +90,31 @@
     <label for="data" dir="rtl">קישור</label>
     <span aria-hidden="true">&gt;</span>
     <input id="data" dir="ltr" type="text" value="https://example.com" spellcheck="false"
-           autocomplete="off" aria-describedby="paste-help" autofocus>
+           autocomplete="off" aria-keyshortcuts="Control+V Meta+V" aria-describedby="paste-help" autofocus>
   </form>
   <div class="work">
     <section class="commands" aria-label="פקודות מקלדת">
-      <p id="paste-help">מדביקים קישור עם <bdi><kbd>Ctrl/⌘+V</kbd></bdi> ומאשרים ב־<bdi><kbd>Enter</kbd></bdi>.</p>
+      <p id="paste-help">להתחלה, הדביקו קישור ולחצו <bdi><kbd>Enter</kbd></bdi>.</p>
       <dl>
-        <dt><bdi><kbd>Tab</kbd> / <kbd>Esc</kbd></bdi></dt><dd>מעבר בין הקישור למטריצה</dd>
+        <dt><bdi><kbd>Esc</kbd></bdi></dt><dd>מעבר בין הקישור למטריצה</dd>
         <dt><bdi><kbd>← ↑ ↓ →</kbd></bdi></dt><dd>תנועה במטריצה</dd>
         <dt><kbd>רווח</kbd></dt><dd>סימון או ביטול סימון</dd>
+      </dl>
+      <dl>
         <dt><bdi><kbd>F</kbd></bdi></dt><dd>חיפוש אזורים בטוחים למחיקה</dd>
         <dt><bdi><kbd>1–3</kbd></bdi></dt><dd>בחירת אזור לתצוגה מקדימה</dd>
         <dt><bdi><kbd>Del</kbd></bdi></dt><dd>מחיקת האזור הנבחר</dd>
+      </dl>
+      <dl>
         <dt><bdi><kbd>R</kbd></bdi></dt><dd>איפוס שינויים</dd>
         <dt><bdi><kbd>P</kbd> / <kbd>S</kbd></bdi></dt><dd>הורדת <bdi>PNG / SVG</bdi></dd>
       </dl>
-      <h2>אזורים מאומתים</h2>
-      <ol class="slots" id="regionResults">
-        <li></li><li></li><li></li>
-      </ol>
+      <div class="region-readout">
+        <h2>אזורים מאומתים</h2>
+        <ol class="slots" id="regionResults">
+          <li></li><li></li><li></li>
+        </ol>
+      </div>
     </section>
     <section class="matrix">
       <div class="readout"><span>מטריצת עריכה</span><bdi id="position">X: 00 / Y: 00</bdi></div>
@@ -102,5 +128,6 @@
 <script src="app.js"></script>
 </body>
 </html>
+
 
 
