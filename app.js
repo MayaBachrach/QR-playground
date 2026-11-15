@@ -190,6 +190,9 @@ function toggleCursor() {
   flip(cursorY * code.modules.size + cursorX);
 }
 function showRegions() {
+  const erase = $("erase");
+  erase.setAttribute("aria-disabled", String(!selectedRegion));
+  if (!selectedRegion && document.activeElement === erase) focusControl(menuItems[0]);
   Array.from($("regionResults").children).forEach((slot, index) => {
     const region = regions[index];
     const selected = Boolean(region && region === selectedRegion);
