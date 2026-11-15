@@ -27,9 +27,12 @@
     padding: clamp(.55rem, 3vw, 2.5rem);
   }
   .terminal { width: min(100%, 54rem); }
-  .navigation { margin-bottom: .75rem; border-bottom: 2px solid; padding-bottom: .5rem; }
-  .stops { display: grid; grid-template-columns: repeat(3, 1fr); gap: .25em; margin: 0 0 .3em; padding: 0; list-style: none; }
-  .stops li { text-align: center; border: 1px solid; font-family: "qArt OSD", var(--osd); }
+  .stops li + li { border-inline-start: 1px dashed; }
+  .stops li:first-child { border-inline-start: 1px solid; }
+  .stops li:last-child { border-inline-end: 1px solid; }
+  .navigation { margin-bottom: .75rem; border-bottom: 2px dashed; padding-bottom: .35rem; }
+  .stops { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0 0 .35em; padding: 0; list-style: none; }
+  .stops li { text-align: center; padding-block: .17em; border-block: 1px solid; font-family: "qArt OSD", var(--osd); }
   .stops li::before { content: "◀" / ""; margin-inline-end: .35em; visibility: hidden; }
   .terminal:has(.prompt:focus-within) .stops li:nth-child(1),
   .terminal:has(.matrix:focus-within) .stops li:nth-child(2),
@@ -40,6 +43,14 @@
   .terminal:has(.matrix:focus-within) .stops li:nth-child(2)::before,
   .terminal:has(.commands:focus-within) .stops li:nth-child(3)::before { visibility: visible; }
   .tab-help { text-align: center; }
+  .mode-help {
+    display: grid; text-align: center; min-height: 2.8em; align-items: center;
+  }
+  .mode-help p { grid-area: 1 / 1; visibility: hidden; }
+  .mode-help #paste-help,
+  .terminal:has(.matrix:focus-within) #grid-help,
+  .terminal:has(.commands:focus-within) #menu-help { visibility: visible; }
+  .terminal:has(.matrix:focus-within, .commands:focus-within) #paste-help { visibility: hidden; }
   h1, h2, p, dl, dt, dd { margin: 0; }
   h1 { font-size: clamp(1.3rem, 4vw, 2rem); padding-inline: .2em; white-space: nowrap; }
   h2 { font-size: 1.05em; }
@@ -60,18 +71,10 @@
   }
   input::selection { background: var(--ink); color: var(--screen); }
   .prompt:focus-within input::selection { background: var(--screen); color: var(--ink); }
-  .work { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 5vw, 3rem); }
+  .work { border-block: 1px dashed; padding-block: .6rem; display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(1rem, 5vw, 3rem); }
   .commands { min-width: 0; grid-column: 1; grid-row: 1; }
   .menu-heading { display: flex; align-items: center; gap: .55em; margin-bottom: .35em; }
   .menu-heading::after { content: ""; flex: 1; border-top: 1px dashed; }
-  #paste-help { margin-bottom: .5em; }
-  .commands dl {
-    padding-block: .4em; border-top: 1px dashed;
-    display: grid; gap: .18em;
-  }
-  .command { display: grid; grid-template-columns: minmax(0, 1fr) 6ch; gap: .35em; }
-  dt { grid-column: 2; grid-row: 1; text-align: left; white-space: nowrap; }
-  dd { grid-column: 1; grid-row: 1; }
   .action, .region-choice {
     width: 100%; border: 0; padding: 0; background: var(--screen); color: var(--ink);
     font: inherit; text-align: inherit;
@@ -81,6 +84,7 @@
     display: flex; align-items: baseline; justify-content: space-between; gap: .4em;
     padding-inline: .35em;
   }
+  .action kbd { padding-inline: .25em; border-inline: 1px solid; }
   .action-name::before { content: "◀" / ""; margin-inline-end: .4em; visibility: hidden; }
   .action:focus-visible .action-name::before { visibility: visible; }
   .action:focus-visible, .region-choice:focus-visible {
@@ -88,7 +92,6 @@
   }
   .region-choice[aria-current="true"] { background: var(--ink); color: var(--screen); }
   .region-choice[aria-current="true"]:focus-visible { outline-offset: 2px; }
-  .menu-help { margin-block: .3em .45em; }
   kbd, bdi { font: inherit; }
   .region-readout { border-top: 1px dashed; padding-top: .45em; }
   .slots {
@@ -107,7 +110,7 @@
   #qr svg { display: block; width: 100%; height: 100%; }
   .status-line {
     display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .55em;
-    border-top: .15em dashed; margin-top: 1rem; padding-top: .5em;
+    margin-top: .45rem;
   }
   .status-label { align-self: start; background: var(--ink); color: var(--screen); padding-inline: .35em; }
   #status { block-size: 2.85em; overflow: auto; overflow-wrap: anywhere; }
@@ -116,13 +119,13 @@
     .work { grid-template-columns: 1fr; gap: .6rem; }
     .commands { grid-row: 2; }
     .matrix { grid-column: 1; grid-row: 1; width: min(100%, 30svh, 19rem); }
-    .commands dl { padding-block: .2em; gap: 0; }
-    .status-line { margin-top: .55rem; }
+    .work { padding-block: .4rem; }
   }
   @media (max-width: 45rem) and (max-height: 650px) {
     body { font-size: .9375rem; line-height: 1.25; }
     header, .prompt, .navigation { margin-bottom: .4rem; }
-    .navigation { padding-bottom: .25rem; }
+    .navigation { padding-bottom: .15rem; }
+    .mode-help { min-height: 2.55em; }
     .matrix { width: min(100%, max(8.5rem, 21svh)); }
     .readout { margin-inline: -.4em; }
     #status { block-size: 2.55em; }
@@ -134,7 +137,12 @@
   <header><h1>תפריט <bdi>qArt</bdi></h1></header>
   <section class="navigation" aria-label="סדר המעבר במקלדת">
     <ol class="stops"><li>קישור</li><li><bdi>QR</bdi></li><li>תפריט</li></ol>
-    <p class="tab-help"><bdi><kbd>TAB</kbd></bdi> קדימה · <bdi><kbd>SHIFT+TAB</kbd></bdi> אחורה</p>
+    <p class="tab-help"><bdi><kbd>TAB</kbd></bdi> לחלק הבא · <bdi><kbd>SHIFT+TAB</kbd></bdi> לחלק הקודם</p>
+    <div class="mode-help">
+      <p id="paste-help">מדביקים קישור עם <bdi><kbd>Ctrl+V / ⌘+V</kbd></bdi> ואז <bdi><kbd>Enter</kbd></bdi></p>
+      <p id="grid-help">החצים מזיזים את הסמן · רווח מסמן או מבטל</p>
+      <p id="menu-help"><bdi><kbd>↑ ↓</kbd></bdi> לבחירה · <bdi><kbd>Enter</kbd></bdi> להפעלה · <bdi><kbd>Esc</kbd></bdi> חזרה ל־QR</p>
+    </div>
   </section>
   <form id="prompt" class="prompt" dir="ltr">
     <label for="data" dir="rtl">קישור</label>
@@ -145,17 +153,10 @@
   <div class="work">
     <section class="matrix">
       <div class="readout"><span>מטריצת עריכה</span><bdi id="position">X: 00 / Y: 00</bdi></div>
-      <div id="qr" tabindex="0" role="img" aria-label="מטריצת קוד QR"></div>
+      <div id="qr" tabindex="0" role="img" aria-label="מטריצת קוד QR" aria-describedby="grid-help"></div>
     </section>
-    <section class="commands" id="commands" aria-label="פקודות מקלדת">
+    <section class="commands" id="commands" aria-label="פקודות מקלדת" aria-describedby="menu-help">
       <h2 class="menu-heading">פקודות מקלדת</h2>
-      <p id="paste-help">הדביקו קישור ולחצו <bdi><kbd>ENTER</kbd></bdi>.</p>
-      <dl aria-label="מקשי עריכה">
-        <div class="command"><dt><bdi><kbd>ESC</kbd></bdi></dt><dd>מעבר לקישור או לעריכה</dd></div>
-        <div class="command"><dt><bdi><kbd>◀▲▼▶</kbd></bdi></dt><dd>תנועה בין משבצות</dd></div>
-        <div class="command"><dt><kbd>רווח</kbd></dt><dd>סימון / ביטול</dd></div>
-      </dl>
-      <p class="menu-help"><bdi><kbd>▲▼</kbd></bdi> לבחירה · <bdi><kbd>ENTER</kbd></bdi> להפעלה</p>
       <button type="button" class="action" data-command="KeyF" tabindex="0"><span class="action-name">חיפוש אזורים</span><kbd>F</kbd></button>
       <div class="region-readout">
         <h2>אזורים מאומתים <bdi>1–3</bdi></h2>

@@ -243,7 +243,7 @@ async function findRegions() {
     selectedRegion = null;
     showRegions();
     status(regions.length
-      ? "נמצאו " + regions.length + " אפשרויות. בחרו אזור לתצוגה מקדימה."
+      ? "נמצאו " + regions.length + " אזורים. בחרו עם 1–3 או עם החצים ו־Enter בתפריט."
       : "לא נמצאו אזורים גדולים שאפשר למחוק בבטחה.");
   } catch (_) {
     clearRegions();
@@ -325,6 +325,13 @@ const input = $("data");
 const matrix = $("qr");
 const menu = $("commands");
 const menuItems = Array.from(document.querySelectorAll("#commands button[data-command]"));
+function focusControl(control) {
+  control.focus({ preventScroll: true });
+  const rect = control.getBoundingClientRect();
+  if (rect.top < 0 || rect.bottom > window.innerHeight) {
+    control.scrollIntoView({ block: "nearest" });
+  }
+}
 menu.addEventListener("focusin", (event) => {
   if (!menuItems.includes(event.target)) return;
   for (const item of menuItems) item.tabIndex = item === event.target ? 0 : -1;
@@ -348,14 +355,17 @@ function moveMenu(item, dx, dy) {
   }
   const rowIndex = rows.findIndex((row) => row.includes(item));
   if (rowIndex === -1) {
-    menuItems[0]?.focus({ preventScroll: true });
+    focusControl(menuItems[0]);
     return;
   }
   const row = rows[(rowIndex + dy + rows.length) % rows.length];
   const column = dy
     ? Math.max(0, row.findIndex((candidate) => candidate.getAttribute("aria-current") === "true"))
     : (row.indexOf(item) - dx + row.length) % row.length;
-  row[column].focus({ preventScroll: true });
+  focusControl(row[column]);
+}
+function shortcut(event) {
+  return /^[1-3]$/.test(event.key) ? "Digit" + event.key : event.code;
 }
 function runCommand(code) {
   if (!busy && Object.hasOwn(commands, code)) commands[code]();
@@ -385,30 +395,30 @@ $("prompt").addEventListener("submit", (event) => {
   }
   if (rebuild(value)) {
     input.value = value;
-    matrix.focus({ preventScroll: true });
+    focusControl(matrix);
   }
 });
 input.addEventListener("keydown", (event) => {
   if (event.key !== "Escape" || event.isComposing) return;
   event.preventDefault();
   input.value = payload;
-  matrix.focus({ preventScroll: true });
+  focusControl(matrix);
 });
 matrix.addEventListener("keydown", (event) => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing) return;
   if (event.key === "Escape") {
     event.preventDefault();
-    input.focus({ preventScroll: true });
+    focusControl(input);
     input.select();
   } else if (event.code === "KeyM") {
     event.preventDefault();
-    menuItems[0]?.focus({ preventScroll: true });
+    focusControl(menuItems[0]);
   } else if (Object.hasOwn(directions, event.key)) {
     event.preventDefault();
     moveCursor(...directions[event.key]);
-  } else if (Object.hasOwn(commands, event.code)) {
+  } else if (Object.hasOwn(commands, shortcut(event))) {
     event.preventDefault();
-    if (!event.repeat) runCommand(event.code);
+    if (!event.repeat) runCommand(shortcut(event));
   }
 });
 for (const item of menuItems) {
@@ -422,14 +432,14 @@ menu.addEventListener("keydown", (event) => {
   if (index < 0) return;
   if (event.key === "Escape" || event.code === "KeyM") {
     event.preventDefault();
-    matrix.focus({ preventScroll: true });
+    focusControl(matrix);
   } else if (Object.hasOwn(directions, event.key)) {
     event.preventDefault();
     const [dx, dy] = directions[event.key];
     moveMenu(event.target, dx, dy);
-  } else if (Object.hasOwn(commands, event.code) && event.code !== "Space") {
+  } else if (Object.hasOwn(commands, shortcut(event)) && event.code !== "Space") {
     event.preventDefault();
-    if (!event.repeat) runCommand(event.code);
+    if (!event.repeat) runCommand(shortcut(event));
   } else if (event.repeat && (event.key === "Enter" || event.code === "Space")) {
     event.preventDefault();
   }
@@ -439,8 +449,8 @@ matrix.addEventListener("paste", (event) => {
   if (!value) return;
   event.preventDefault();
   input.value = value.trim();
-  input.focus({ preventScroll: true });
+  focusControl(input);
 });
 rebuild();
-status("מוכן להדבקה עם Ctrl+V או ⌘+V");
+status("מוכן להדבקה");
 input.select();
