@@ -17,6 +17,18 @@ function status(message) {
 }
 function lock(value) {
   busy = value;
+  $("work-state").textContent = value ? "בודק… אפשר להמשיך לנווט" : "מוכן";
+  matrix.setAttribute("aria-busy", String(value));
+  syncAvailability();
+}
+function syncAvailability() {
+  for (const item of menuItems) {
+    const command = item.dataset.command;
+    const unavailable = busy || !cells ||
+      (command === "Delete" && !selectedRegion) ||
+      (/^Digit/.test(command) && !regions[Number(command.slice(-1)) - 1]);
+    item.setAttribute("aria-disabled", String(unavailable));
+  }
 }
 function clearRegions() {
   selectedRegion = null;
@@ -42,6 +54,7 @@ function makeSvg(preview = false) {
   const size = code.modules.size;
   const svg = element("svg", {
     xmlns: ns,
+    "shape-rendering": "crispEdges",
     viewBox: "-4 -4 " + (size + 8) + " " + (size + 8),
     width: 800,
     height: 800,
@@ -71,11 +84,11 @@ function makeSvg(preview = false) {
   }
   if (preview) {
     svg.append(element("rect", {
-      x: cursorX - .10, y: cursorY - .10, width: 1.20, height: 1.20,
+      "data-cursor": "inner", x: cursorX - .10, y: cursorY - .10, width: 1.20, height: 1.20,
       fill: "none", stroke: PINK, "stroke-width": .20, "pointer-events": "none"
     }));
     svg.append(element("rect", {
-      x: cursorX - .22, y: cursorY - .22, width: 1.44, height: 1.44,
+      "data-cursor": "outer", x: cursorX - .22, y: cursorY - .22, width: 1.44, height: 1.44,
       fill: "none", stroke: BLACK, "stroke-width": .12, "pointer-events": "none"
     }));
   }
@@ -84,6 +97,17 @@ function makeSvg(preview = false) {
 function paint() {
   if (!cells) return;
   $("qr").replaceChildren(makeSvg(true));
+  paintCursor();
+}
+function paintCursor() {
+  for (const [name, offset] of [["inner", .10], ["outer", .22]]) {
+    const marker = matrix.querySelector?.('[data-cursor="' + name + '"]');
+    marker?.setAttribute("x", cursorX - offset);
+    marker?.setAttribute("y", cursorY - offset);
+  }
+  const protectedCell = Boolean(code.modules.reservedBit[cursorY * code.modules.size + cursorX]);
+  $("cell-state").textContent = selectedRegion ? "אזור " + (regions.indexOf(selectedRegion) + 1) + " · Del למחיקה · 1–3 להחלפה" : protectedCell ? "מוגנת · עברו עם החצים" : "ניתנת לעריכה · רווח לשינוי";
+  matrix.setAttribute("aria-label", "עורך QR, שורה " + (cursorY + 1) + ", עמודה " + (cursorX + 1) + (protectedCell ? ", משבצת מוגנת" : ", משבצת ניתנת לעריכה"));
   $("position").textContent =
     "X: " + String(cursorX + 1).padStart(2, "0") +
     " / Y: " + String(cursorY + 1).padStart(2, "0");
@@ -119,7 +143,8 @@ function rebuild(nextPayload = payload) {
     cells = Uint8Array.from(code.modules.data);
     resetCursor();
     paint();
-    status("הקוד מוכן לעריכה");
+    syncAvailability();
+    status("הקוד מוכן. חצים לתנועה, רווח לשינוי, Tab לתפריט.");
     return true;
   } catch (_) {
     status("לא ניתן ליצור קוד מהקישור הזה. נסו קישור קצר יותר.");
@@ -127,11 +152,11 @@ function rebuild(nextPayload = payload) {
   }
 }
 function moveCursor(dx, dy) {
-  if (busy || !cells) return;
+  if (!cells) return;
   const size = code.modules.size;
   cursorX = Math.max(0, Math.min(size - 1, cursorX + dx));
   cursorY = Math.max(0, Math.min(size - 1, cursorY + dy));
-  paint();
+  paintCursor();
 }
 async function verifies() {
   if (!cells) return false;
@@ -168,10 +193,11 @@ async function flip(index) {
     return;
   }
   lock(true);
-  clearRegions();
+  status("בודק את השינוי…");
   cells[index] ^= 1;
   try {
     if (await verifies()) {
+      clearRegions();
       status("השינוי נשמר. הקוד עדיין קריא.");
     } else {
       cells[index] ^= 1;
@@ -191,8 +217,8 @@ function toggleCursor() {
 }
 function showRegions() {
   const erase = $("erase");
-  erase.setAttribute("aria-disabled", String(!selectedRegion));
-  if (!selectedRegion && document.activeElement === erase) focusControl(menuItems[0]);
+  erase.setAttribute("aria-disabled", String(busy || !selectedRegion));
+  // Keep the current menu location, even when its action becomes unavailable.
   Array.from($("regionResults").children).forEach((slot, index) => {
     const region = regions[index];
     const selected = Boolean(region && region === selectedRegion);
@@ -200,10 +226,11 @@ function showRegions() {
     choice.textContent = (index + 1) + " · " +
       (region ? region.w + "×" + region.h : "—");
     choice.setAttribute("aria-current", String(selected));
-    choice.setAttribute("aria-disabled", String(!region));
+    choice.setAttribute("aria-disabled", String(busy || !region));
   });
 }
 function chooseRegion(index) {
+  if (busy) return;
   if (!regions[index]) {
     status("אין אזור במספר הזה. לחצו F לחיפוש.");
     return;
@@ -211,48 +238,52 @@ function chooseRegion(index) {
   selectedRegion = regions[index];
   showRegions();
   paint();
-  status("אזור " + (index + 1) + " נבחר. לחצו Del למחיקה.");
+  status("אזור " + (index + 1) + " נבחר. 1–3 להחלפה, Del למחיקה.");
+  focusControl(matrix);
+}
+function searchInWorker() {
+  return new Promise((resolve, reject) => {
+    let worker;
+    let timer;
+    const finish = (error, result) => {
+      clearTimeout(timer);
+      worker?.terminate();
+      error ? reject(error) : resolve(result);
+    };
+    try {
+      worker = new Worker("search-worker.js");
+      timer = setTimeout(() => finish(new Error("Search timeout")), 60000);
+      worker.onerror = () => finish(new Error("Search worker failed"));
+      worker.onmessage = ({ data }) => {
+        if (data.progress !== undefined) {
+          status("בודק אזורים… " + data.progress + " בדיקות. אפשר לנווט בזמן ההמתנה.");
+        } else if (data.error) finish(new Error(data.error));
+        else finish(null, data.result);
+      };
+      worker.postMessage({
+        size: code.modules.size,
+        reserved: code.modules.reservedBit,
+        dark: cells,
+        payload
+      });
+    } catch (error) { finish(error); }
+  });
 }
 async function findRegions() {
   if (!cells || busy) return;
   lock(true);
-  clearRegions();
-  const original = Uint8Array.from(cells);
-  status("מחפש שטחים גדולים שאפשר למחוק...");
+  status("מחפש שטחים גדולים שאפשר למחוק… אפשר להמשיך לנווט.");
   try {
-    if (!await verifies()) {
-      status("הקוד אינו קריא כרגע. יש לאפס את השינויים.");
-      return;
-    }
-    const result = await QRRegions.search({
-      size: code.modules.size,
-      reserved: code.modules.reservedBit,
-      dark: original,
-      verify: async (region) => {
-        cells = eraseRegion(original, region);
-        try {
-          return await verifies();
-        } finally {
-          cells = original;
-        }
-      },
-      progress: (count) => {
-        if (count % 12 === 0) {
-          status("בודק אפשרויות למחיקה... " + count + " בדיקות");
-        }
-      }
-    });
+    const result = await searchInWorker();
     regions = result.regions;
     selectedRegion = null;
     showRegions();
     status(regions.length
-      ? "נמצאו " + regions.length + " אזורים. בחרו עם 1–3 או עם החצים ו־Enter בתפריט."
-      : "לא נמצאו אזורים גדולים שאפשר למחוק בבטחה.");
+      ? "נמצאו " + regions.length + " אזורים. 1–3 לתצוגה ובחירה, Del למחיקה."
+      : "לא נמצאו אזורים גדולים שאפשר למחוק בבטחה. אפשר לערוך משבצות.");
   } catch (_) {
-    clearRegions();
-    status("חיפוש האזורים נכשל. אפשר לנסות שוב.");
+    status("החיפוש נכשל. הקוד והבחירה נשמרו; לחצו F לניסיון נוסף.");
   } finally {
-    cells = original;
     lock(false);
     paint();
   }
@@ -269,12 +300,10 @@ async function deleteRegion() {
       status("האזור נמחק. הקוד עדיין קריא.");
     } else {
       cells = original;
-      clearRegions();
-      status("המחיקה בוטלה כדי לשמור על קריאות הקוד.");
+      status("המחיקה בוטלה כדי לשמור על קריאות הקוד. הבחירה נשמרה.");
     }
   } catch (_) {
     cells = original;
-    clearRegions();
     status("המחיקה נכשלה. הקוד הוחזר למצבו הקודם.");
   } finally {
     paint();
@@ -330,9 +359,10 @@ const menu = $("commands");
 const menuItems = Array.from(document.querySelectorAll("#commands button[data-command]"));
 function focusControl(control) {
   control.focus({ preventScroll: true });
-  const rect = control.getBoundingClientRect();
-  if (rect.top < 0 || rect.bottom > window.innerHeight) {
-    control.scrollIntoView({ block: "nearest" });
+  const context = control === matrix ? control.closest(".matrix") : control;
+  const rect = context.getBoundingClientRect();
+  if (rect.top < 12 || rect.bottom > window.innerHeight - 12) {
+    context.scrollIntoView({ block: rect.height < window.innerHeight - 24 ? "nearest" : "start" });
   }
 }
 menu.addEventListener("focusin", (event) => {
@@ -341,12 +371,12 @@ menu.addEventListener("focusin", (event) => {
 });
 menu.addEventListener("focusout", (event) => {
   if (menuItems.includes(event.relatedTarget)) return;
-  for (const [index, item] of menuItems.entries()) item.tabIndex = index === 0 ? 0 : -1;
+  // Preserve the last focused command for the next visit.
 });
 function moveMenu(item, dx, dy) {
   const rows = [];
   for (const candidate of menuItems) {
-    if (candidate.getAttribute("aria-disabled") === "true") continue;
+    // Disabled commands remain discoverable with an explanation.
     if (candidate.classList.contains("region-choice")) {
       const regionRow = rows.find((row) => row[0].classList.contains("region-choice"));
       if (regionRow) {
@@ -371,7 +401,8 @@ function shortcut(event) {
   return /^[1-3]$/.test(event.key) ? "Digit" + event.key : event.code;
 }
 function runCommand(code) {
-  if (!busy && Object.hasOwn(commands, code)) commands[code]();
+  if (busy) return;
+  if (Object.hasOwn(commands, code)) commands[code]();
 }
 const directions = {
   ArrowUp: [0, -1], ArrowDown: [0, 1],
@@ -390,7 +421,7 @@ const commands = {
 };
 $("prompt").addEventListener("submit", (event) => {
   event.preventDefault();
-  if (busy) return;
+  if (busy) { status("הפעולה עדיין מתבצעת. הקישור שהקלדתם נשמר בשדה."); return; }
   const value = input.value.trim();
   if (!value) {
     status("הדביקו קישור או הקלידו טקסט ליצירת קוד.");
@@ -402,6 +433,7 @@ $("prompt").addEventListener("submit", (event) => {
   }
 });
 input.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   if (event.key !== "Escape" || event.isComposing) return;
   event.preventDefault();
   input.value = payload;
@@ -426,7 +458,8 @@ matrix.addEventListener("keydown", (event) => {
 });
 for (const item of menuItems) {
   item.addEventListener("click", () => {
-    if (item.getAttribute("aria-disabled") !== "true") runCommand(item.dataset.command);
+    if (busy) return;
+    runCommand(item.dataset.command);
   });
 }
 menu.addEventListener("keydown", (event) => {
@@ -447,13 +480,21 @@ menu.addEventListener("keydown", (event) => {
     event.preventDefault();
   }
 });
-matrix.addEventListener("paste", (event) => {
+document.addEventListener("paste", (event) => {
+  if (event.target === input || !document.querySelector("main").contains(event.target)) return;
   const value = event.clipboardData?.getData("text/plain");
   if (!value) return;
   event.preventDefault();
   input.value = value.trim();
   focusControl(input);
 });
+for (const button of document.querySelectorAll("[data-move]")) {
+  button.addEventListener("click", () => {
+    focusControl(matrix);
+    if (button.dataset.move === "toggle") toggleCursor();
+    else moveCursor(...directions[button.dataset.move]);
+  });
+}
 rebuild();
 status("מוכן להדבקה");
 input.select();

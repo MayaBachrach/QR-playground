@@ -15,7 +15,7 @@ class Element{
 }
 const nodes={data:new Element()};
 nodes.data.value='https://example.com';
-const document={getElementById:id=>nodes[id]??=new Element(),createElementNS:(ns,tag)=>Object.assign(new Element(),{tag}),querySelectorAll:()=>[]};
+const document={addEventListener(){},getElementById:id=>nodes[id]??=new Element(),createElementNS:(ns,tag)=>Object.assign(new Element(),{tag}),querySelectorAll:()=>[]};
 const context=vm.createContext({document,QREngine:{create:QRCode.create,decode:jsQR},console,Uint8Array,Set});
 vm.runInContext(fs.readFileSync('app.js','utf8'),context);
 function serialize(node){return `<${node.tag} ${Object.entries(node.attrs).map(([k,v])=>`${k}="${v.replaceAll('&','&amp;').replaceAll('"','&quot;')}"`).join(' ')}>${node.children.map(serialize).join('')}</${node.tag}>`}
