@@ -193,10 +193,11 @@ function showRegions() {
   Array.from($("regionResults").children).forEach((slot, index) => {
     const region = regions[index];
     const selected = Boolean(region && region === selectedRegion);
-    slot.classList.toggle("selected", selected);
-    slot.textContent = (index + 1) + " · " +
+    const choice = slot.firstElementChild;
+    choice.textContent = (index + 1) + " · " +
       (region ? region.w + "×" + region.h : "—");
-    slot.setAttribute("aria-current", String(selected));
+    choice.setAttribute("aria-current", String(selected));
+    choice.setAttribute("aria-disabled", String(!region));
   });
 }
 function chooseRegion(index) {
@@ -322,6 +323,35 @@ async function download(ext) {
 }
 const input = $("data");
 const matrix = $("qr");
+const menu = $("commands");
+const menuItems = Array.from(document.querySelectorAll("#commands button[data-command]"));
+function moveMenu(item, dx, dy) {
+  const rows = [];
+  for (const candidate of menuItems) {
+    if (candidate.getAttribute("aria-disabled") === "true") continue;
+    if (candidate.classList.contains("region-choice")) {
+      const regionRow = rows.find((row) => row[0].classList.contains("region-choice"));
+      if (regionRow) {
+        regionRow.push(candidate);
+        continue;
+      }
+    }
+    rows.push([candidate]);
+  }
+  const rowIndex = rows.findIndex((row) => row.includes(item));
+  if (rowIndex === -1) {
+    menuItems[0]?.focus({ preventScroll: true });
+    return;
+  }
+  const row = rows[(rowIndex + dy + rows.length) % rows.length];
+  const column = dy
+    ? Math.max(0, row.findIndex((candidate) => candidate.getAttribute("aria-current") === "true"))
+    : (row.indexOf(item) - dx + row.length) % row.length;
+  row[column].focus({ preventScroll: true });
+}
+function runCommand(code) {
+  if (!busy && Object.hasOwn(commands, code)) commands[code]();
+}
 const directions = {
   ArrowUp: [0, -1], ArrowDown: [0, 1],
   ArrowLeft: [-1, 0], ArrowRight: [1, 0]
@@ -362,12 +392,38 @@ matrix.addEventListener("keydown", (event) => {
     event.preventDefault();
     input.focus({ preventScroll: true });
     input.select();
+  } else if (event.code === "KeyM") {
+    event.preventDefault();
+    menuItems[0]?.focus({ preventScroll: true });
   } else if (Object.hasOwn(directions, event.key)) {
     event.preventDefault();
     moveCursor(...directions[event.key]);
   } else if (Object.hasOwn(commands, event.code)) {
     event.preventDefault();
-    if (!busy && !event.repeat) commands[event.code]();
+    if (!event.repeat) runCommand(event.code);
+  }
+});
+for (const item of menuItems) {
+  item.addEventListener("click", () => {
+    if (item.getAttribute("aria-disabled") !== "true") runCommand(item.dataset.command);
+  });
+}
+menu.addEventListener("keydown", (event) => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing) return;
+  const index = menuItems.indexOf(event.target);
+  if (index < 0) return;
+  if (event.key === "Escape" || event.code === "KeyM") {
+    event.preventDefault();
+    matrix.focus({ preventScroll: true });
+  } else if (Object.hasOwn(directions, event.key)) {
+    event.preventDefault();
+    const [dx, dy] = directions[event.key];
+    moveMenu(event.target, dx, dy);
+  } else if (Object.hasOwn(commands, event.code) && event.code !== "Space") {
+    event.preventDefault();
+    if (!event.repeat) runCommand(event.code);
+  } else if (event.repeat && (event.key === "Enter" || event.code === "Space")) {
+    event.preventDefault();
   }
 });
 matrix.addEventListener("paste", (event) => {
